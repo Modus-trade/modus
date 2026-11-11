@@ -1037,13 +1037,6 @@ td:last-child {
   color: #526b80;
   font-size: 12px;
 }
-.categories-chart {
-  margin-bottom: 23px;
-  padding-bottom: 16px;
-}
-.categories-chart > .panel-title {
-  padding-bottom: 20px;
-}
 .page-footer {
   display: flex;
   justify-content: space-between;
@@ -2249,9 +2242,6 @@ a:focus-visible {
   .file-drop small {
     font-size: 12px;
   }
-  .categories-chart .recharts-wrapper {
-    font-size: 13px;
-  }
   .form-actions .button {
     font-size: 15px;
   }
@@ -3447,13 +3437,6 @@ textarea {
 }
 .funnel-row > span {
   width: 150px;
-}
-.category-chart-scroll {
-  overflow-x: auto;
-  padding-inline: 16px;
-}
-.category-chart-canvas {
-  min-width: 560px;
 }
 .ticket-meta {
   margin-bottom: 8px;

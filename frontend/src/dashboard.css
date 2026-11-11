@@ -1,0 +1,47 @@
+/* Keep the existing Manrope face consistent in native controls and charts. */
+body,
+button,
+input,
+select,
+textarea,
+svg text,
+[data-sonner-toaster] {
+  font-family: var(--font-ui);
+}
+
+.panel-title h3 {
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.panel-title p,
+.page-heading p {
+  font-size: 15px;
+}
+
+.dashboard-page .metric-top,
+.dashboard-page .legend > div,
+.dashboard-page .funnel-row {
+  font-size: 15px;
+}
+
+.dashboard-page .metric-note,
+.dashboard-page .donut-center span,
+.dashboard-page .subtle-tag {
+  font-size: 14px;
+}
+
+.dashboard-page .funnel-row > span {
+  width: 175px;
+}
+
+@media (max-width: 680px) {
+  .dashboard-page .funnel-row {
+    gap: 8px;
+    font-size: 14px;
+  }
+
+  .dashboard-page .funnel-row > span {
+    width: 145px;
+  }
+}

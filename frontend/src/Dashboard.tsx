@@ -17,11 +17,6 @@ import {
   Pie,
   Cell,
   Tooltip,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
 } from "recharts";
 import {
   api,
@@ -33,6 +28,7 @@ import {
 } from "./lib";
 import { Button } from "./components/ui/button";
 import { Failure, Loading, TicketTable } from "./components/common";
+import TopicOverview from "./components/TopicOverview";
 const colors = ["#ed151c", "#0b2d48", "#9bb1c5"];
 export default function Dashboard({
   user,
@@ -88,7 +84,7 @@ export default function Dashboard({
     },
   ];
   return (
-    <div className="page-enter">
+    <div className="page-enter dashboard-page">
       <div className="page-heading">
         <div>
           <h1>
@@ -263,68 +259,7 @@ export default function Dashboard({
           <TicketTable tickets={recent.data?.items || []} />
         )}
       </section>
-      <section className="panel categories-chart">
-        <div className="panel-title">
-          <div>
-            <h3>Темы обращений</h3>
-            <p>Распределение по категориям</p>
-          </div>
-        </div>
-        <div
-          className="category-chart-scroll"
-          tabIndex={0}
-          role="region"
-          aria-label="График тем обращений — горизонтальная прокрутка"
-        >
-          <div className="category-chart-canvas">
-            <ResponsiveContainer
-              width="100%"
-              height={Math.max(240, Object.keys(d.by_category).length * 44)}
-            >
-              <BarChart
-                layout="vertical"
-                data={Object.entries(d.by_category).map(([name, value]) => ({
-                  name,
-                  value,
-                }))}
-                margin={{ left: 0, right: 25 }}
-              >
-                <CartesianGrid stroke="#12334d0d" horizontal={false} />
-                <XAxis
-                  type="number"
-                  allowDecimals={false}
-                  tick={{ fill: "#526b80", fontSize: 13 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  type="category"
-                  dataKey="name"
-                  width={230}
-                  tick={{ fill: "#526b80", fontSize: 13 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip
-                  cursor={{ fill: "#12334d05" }}
-                  contentStyle={{
-                    background: "#ffffff",
-                    border: "1px solid #e0e6ee",
-                    borderRadius: 10,
-                  }}
-                />
-                <Bar
-                  dataKey="value"
-                  name="Обращения"
-                  fill="#153e5e"
-                  radius={[0, 4, 4, 0]}
-                  barSize={10}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </section>
+      <TopicOverview categories={d.by_category} />
       {d.repeated?.length ? (
         <section className="panel recent-panel">
           <div className="panel-title">
