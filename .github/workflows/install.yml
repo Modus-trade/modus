@@ -31,14 +31,16 @@ jobs:
           pip install -r requirements.txt
           alembic upgrade head
           python seed.py
-          Start-Process -FilePath .\.venv\Scripts\uvicorn.exe -ArgumentList "app.main:app","--port","8000" -RedirectStandardOutput ..\backend.log -RedirectStandardError ..\backend.err
       - name: "Шаг 4: сайт"
         run: |
           cd frontend
           npm ci
-          Start-Process -FilePath npm.cmd -ArgumentList "run","dev" -RedirectStandardOutput ..\frontend.log -RedirectStandardError ..\frontend.err
-      - name: "Шаг 5: сайт открывается, вход работает"
+      - name: "Шаг 5: запуск (uvicorn + npm run dev), сайт открывается, вход работает"
         run: |
+          # Запуск и проверка в одном шаге: Windows-раннер закрывает фоновые процессы в конце шага.
+          $root = (Get-Location).Path
+          Start-Process -FilePath "$root\backend\.venv\Scripts\uvicorn.exe" -ArgumentList "app.main:app","--port","8000" -WorkingDirectory "$root\backend" -RedirectStandardOutput "$root\backend.log" -RedirectStandardError "$root\backend.err"
+          Start-Process -FilePath npm.cmd -ArgumentList "run","dev" -WorkingDirectory "$root\frontend" -RedirectStandardOutput "$root\frontend.log" -RedirectStandardError "$root\frontend.err"
           $ok = $false
           foreach ($i in 1..60) { try { Invoke-WebRequest http://127.0.0.1:5173 -UseBasicParsing -TimeoutSec 5 | Out-Null; $ok = $true; break } catch { Start-Sleep 2 } }
           if (-not $ok) { throw "Сайт не открылся" }
