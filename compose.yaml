@@ -1,0 +1,22 @@
+services:
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: sqlite:////data/app.db
+      JWT_SECRET: ${JWT_SECRET:-modus-local-demo-change-this-secret-before-production}
+    volumes:
+      - database:/data
+      - uploads:/app/uploads
+    ports:
+      - "127.0.0.1:8000:8000"
+  frontend:
+    build: ./frontend
+    environment:
+      API_TARGET: http://backend:8000
+    ports:
+      - "127.0.0.1:5173:5173"
+    depends_on:
+      - backend
+volumes:
+  database:
+  uploads:

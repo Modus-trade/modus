@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.venv/
+.venv312/
+__pycache__/
+.pytest_cache/
+*.db
+*.db-*
+backend/uploads/
+.env
+*.tsbuildinfo
+.python/
+!.env.example
