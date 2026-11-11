@@ -24,7 +24,7 @@
 - [Что умеет система](#-что-умеет-система)
 - [Как устроено](#-как-устроено)
 - [Репозитории и процесс разработки](#-репозитории-и-процесс-разработки)
-- [Запуск у себя](#-запуск-у-себя) · [с нуля на Windows](#с-нуля-на-windows)
+- [Запуск у себя](#-запуск-у-себя) · [Windows с нуля](#windows-с-нуля-vs-code)
 - [Проверки](#-проверки)
 - [Документация](#-документация)
 
@@ -128,40 +128,41 @@ flowchart LR
 
 Локально ничего настраивать не нужно: без переменных окружения бэкенд создаёт свою SQLite-базу с демо-данными. Боевая база при этом не затрагивается.
 
-### С нуля на Windows
-
 > Просто посмотреть систему можно без установки: откройте **https://modus-trade.makquiz.site**.
 
-**1. Установите программы** (один раз, в PowerShell):
+Каждая инструкция ниже проверяется автоматически на чистых машинах GitHub (Windows, macOS, Linux с Docker): [![Проверка установки](https://github.com/Modus-trade/modus/actions/workflows/install.yml/badge.svg)](https://github.com/Modus-trade/modus/actions/workflows/install.yml)
+
+### Windows с нуля (VS Code)
+
+**1. Установите программы.** Откройте PowerShell и выполните:
 
 ```powershell
-winget install Git.Git Python.Python.3.12 OpenJS.NodeJS.LTS
+winget install -e --id Git.Git
+winget install -e --id Python.Python.3.12
+winget install -e --id OpenJS.NodeJS.LTS
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned -Force
 ```
 
-Закройте и снова откройте PowerShell или VS Code, чтобы программы стали доступны в терминале.
+Последняя строка разрешает PowerShell запускать `npm` и окружение Python. Без неё будет ошибка «выполнение сценариев отключено».
+**После установки закройте и заново откройте VS Code**, чтобы он увидел новые программы.
 
-**2. Скачайте проект.** В VS Code: `Ctrl+Shift+P` → **Git: Clone** → `https://github.com/Modus-trade/modus` → войдите в GitHub, если появится запрос. Или из терминала:
+**2. Скачайте проект.** В VS Code: `Ctrl+Shift+P` → **Git: Clone** → вставьте `https://github.com/Modus-trade/modus` → выберите папку → **Open**. Если GitHub попросит войти, войдите в аккаунт, у которого есть доступ к организации.
 
-```powershell
-git clone https://github.com/Modus-trade/modus.git
-cd modus
-```
-
-**3. Запустите бэкенд** (терминал VS Code: `` Ctrl+` ``):
+**3. Запустите бэкенд.** Откройте терминал (`` Ctrl+` ``). Он откроется в папке проекта:
 
 ```powershell
 cd backend
 py -3.12 -m venv .venv
-.\.venv\Scripts\activate
+.\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 alembic upgrade head
 python seed.py
 uvicorn app.main:app --port 8000
 ```
 
-> Если PowerShell пишет, что запуск скриптов запрещён: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, затем повторите `activate`.
+Готово, когда появится строка `Application startup complete`. Этот терминал не закрывайте.
 
-**4. Запустите сайт** во втором терминале (кнопка **+** в панели терминала):
+**4. Запустите сайт.** Откройте второй терминал кнопкой **+** в панели терминала. Он тоже откроется в корне проекта:
 
 ```powershell
 cd frontend
@@ -171,36 +172,54 @@ npm run dev
 
 **5. Откройте** http://localhost:5173 и войдите как `admin@modus.demo` с паролем `demo1234`.
 
-В следующий раз достаточно шагов 3 и 4 без установки: `.\.venv\Scripts\activate` → `uvicorn app.main:app --port 8000` и `npm run dev`.
+**В следующий раз** установка не нужна. В первом терминале выполните `cd backend`, `.\.venv\Scripts\Activate.ps1`, `uvicorn app.main:app --port 8000`; во втором — `cd frontend`, `npm run dev`.
 
-### Docker (если установлен Docker Desktop)
+### macOS / Linux
+
+Нужны Python 3.12+ и Node.js 22+ (на macOS: `brew install python@3.12 node`).
+
+**Терминал 1 — бэкенд**, из корня проекта:
+
+```sh
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+alembic upgrade head
+python seed.py
+uvicorn app.main:app --port 8000
+```
+
+**Терминал 2 — сайт**, тоже из корня проекта:
+
+```sh
+cd frontend
+npm ci
+npm run dev
+```
+
+Откройте http://localhost:5173 и войдите как `admin@modus.demo` / `demo1234`.
+На macOS после первой установки можно просто дважды кликнуть `start.command`: он запустит оба процесса.
+
+### Docker
+
+Если установлен [Docker Desktop](https://www.docker.com/products/docker-desktop/), достаточно одной команды из корня проекта:
 
 ```sh
 docker compose up --build
 ```
 
-Сайт: http://127.0.0.1:5173 · Swagger: http://127.0.0.1:8000/docs
+Первая сборка занимает несколько минут. Затем откройте http://localhost:5173 (Swagger: http://localhost:8000/docs). Остановить: `Ctrl+C`.
 
-### macOS / Linux без Docker
+### Если что-то не так
 
-Нужны Python 3.12+ и Node.js 22+.
-
-```sh
-# 1. Бэкенд — терминал 1
-cd backend
-python3 -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-alembic upgrade head        # создать базу
-python seed.py              # демо-данные: 13 пользователей, 18 категорий, 20 обращений
-uvicorn app.main:app --reload --port 8000
-
-# 2. Сайт — терминал 2
-cd frontend
-npm ci
-npm run dev                 # http://localhost:5173, /api проксируется на :8000
-```
-
-На macOS после установки можно дважды кликнуть `start.command`: он запустит оба процесса.
+| Проблема | Решение |
+| --- | --- |
+| `py`, `python`, `npm` или `git` не найдены | перезапустите VS Code или терминал после установки |
+| «выполнение сценариев отключено» | `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned -Force` |
+| `Repository not found` при клонировании | у вашего аккаунта GitHub нет доступа к организации; попросите приглашение |
+| сайт открылся, но вход не работает | бэкенд не запущен: проверьте первый терминал |
+| порт 8000 или 5173 занят | закройте предыдущий запуск (`Ctrl+C` в его терминале) |
 
 ### iOS-приложение
 
