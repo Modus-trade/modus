@@ -1,0 +1,120 @@
+name: Проверка установки
+
+# Выполняет команды из раздела «Запуск у себя» README на чистых машинах
+# и проверяет, что сайт открывается, а демо-пользователь входит.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    name: Windows (PowerShell)
+    runs-on: windows-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+
+      - name: "Шаг 3: бэкенд"
+        run: |
+          cd backend
+          py -3.12 -m venv .venv
+          .\.venv\Scripts\Activate.ps1
+          pip install -r requirements.txt
+          alembic upgrade head
+          python seed.py
+      - name: "Шаг 4: сайт"
+        run: |
+          cd modus-front
+          npm ci
+      - name: "Шаг 5: запуск (uvicorn + npm run dev), сайт открывается, вход работает"
+        run: |
+          # Запуск и проверка в одном шаге: Windows-раннер закрывает фоновые процессы в конце шага.
+          $root = (Get-Location).Path
+          Start-Process -FilePath "$root\backend\.venv\Scripts\uvicorn.exe" -ArgumentList "app.main:app","--port","8000" -WorkingDirectory "$root\backend" -RedirectStandardOutput "$root\backend.log" -RedirectStandardError "$root\backend.err"
+          Start-Process -FilePath npm.cmd -ArgumentList "run","dev" -WorkingDirectory "$root\modus-front" -RedirectStandardOutput "$root\frontend.log" -RedirectStandardError "$root\frontend.err"
+          $ok = $false
+          foreach ($i in 1..60) { try { Invoke-WebRequest http://127.0.0.1:5173 -UseBasicParsing -TimeoutSec 5 | Out-Null; $ok = $true; break } catch { Start-Sleep 2 } }
+          if (-not $ok) { throw "Сайт не открылся" }
+          $s = New-Object Microsoft.PowerShell.Commands.WebRequestSession
+          Invoke-RestMethod http://127.0.0.1:5173/api/auth/login -Method Post -WebSession $s -ContentType "application/json" `
+            -Headers @{ Origin = "http://127.0.0.1:5173" } -Body '{"email":"admin@modus.demo","password":"demo1234"}' | Out-Null
+          $t = Invoke-RestMethod http://127.0.0.1:5173/api/tickets -WebSession $s
+          if ($t.items.Count -lt 1) { throw "Нет демо-обращений" }
+          "Вход выполнен, обращений: $($t.total)"
+      - name: Логи при ошибке
+        if: failure()
+        run: Get-Content backend.log, backend.err, frontend.log, frontend.err -ErrorAction SilentlyContinue
+
+  macos:
+    name: macOS
+    runs-on: macos-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: "Терминал 1: бэкенд"
+        run: |
+          cd backend
+          python3 -m venv .venv
+          source .venv/bin/activate
+          pip install -r requirements.txt
+          alembic upgrade head
+          python seed.py
+          nohup uvicorn app.main:app --port 8000 > ../backend.log 2>&1 &
+      - name: "Терминал 2: сайт"
+        run: |
+          cd modus-front
+          npm ci
+          nohup npm run dev > ../frontend.log 2>&1 &
+      - name: Сайт открывается, вход работает
+        run: ./.github/check-site.sh http://127.0.0.1:5173
+      - name: Тесты
+        run: |
+          (cd backend && .venv/bin/python -m pytest -q)
+          (cd modus-front && npm test && npm run build)
+      - name: Логи при ошибке
+        if: failure()
+        run: cat backend.log frontend.log || true
+
+  docker:
+    name: Docker
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: docker compose up --build
+        run: docker compose up -d --build
+      - name: Сайт открывается, вход работает
+        run: ./.github/check-site.sh http://127.0.0.1:5173
+      - name: Логи при ошибке
+        if: failure()
+        run: docker compose logs
+
+  mobile:
+    name: iOS-приложение
+    runs-on: macos-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: npm install
+        working-directory: mobile
+        run: npm install
+      - name: Проверка типов и сборка JS-бандла для iOS
+        working-directory: mobile
+        run: |
+          npx tsc --noEmit
+          npx expo export --platform ios --output-dir /tmp/expo-export

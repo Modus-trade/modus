@@ -14,7 +14,7 @@ router = APIRouter(prefix="/api/analytics", tags=["analytics"])
 def attention(
     db: DB,
     user: Admin,
-    reason: Literal["all", "unassigned", "overdue", "stale"] = "all",
+    reason: Literal["all", "unassigned", "overdue", "resolution_overdue", "stale"] = "all",
     stale_days: int = Query(7, ge=1, le=90),
     q: str = Query("", max_length=250),
     priority: Literal["LOW", "MEDIUM", "HIGH"] | None = None,
@@ -29,7 +29,7 @@ def attention(
     for row in rows:
         item = serialize(db, row[0])
         item["attention_reasons"] = [
-            key for key in ("unassigned", "overdue", "stale") if row._mapping[key]
+            key for key in ("unassigned", "overdue", "resolution_overdue", "stale") if row._mapping[key]
         ]
         item["last_activity_at"] = row._mapping["last_activity_at"]
         items.append(item)
@@ -74,4 +74,10 @@ def summary(db: DB, user: CurrentUser):
         else None,
         "overdue_count": len(overdue),
         "overdue_tickets": [serialize(db, t) for t in overdue],
+        # Повторяющиеся проблемы: общие проблемы, к которым присоединились другие сотрудники.
+        "repeated": sorted(
+            (item for item in (serialize(db, t) for t in tickets if t.type == "PROBLEM" and t.is_shared)
+             if item["affected_count"] > 1),
+            key=lambda item: (-item["affected_count"], item["number"]),
+        )[:5],
     }
