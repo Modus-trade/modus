@@ -37,7 +37,7 @@ export const transitions: Record<string, string[]> = {
   ],
   IN_PROGRESS: ["AWAITING_CLARIFICATION", "IMPLEMENTED", "REJECTED"],
   AWAITING_CLARIFICATION: ["IN_REVIEW", "IN_PROGRESS", "REJECTED"],
-  IMPLEMENTED: ["CLOSED"],
+  IMPLEMENTED: [],
   REJECTED: ["CLOSED"],
   CLOSED: [],
 };
@@ -105,12 +105,28 @@ export interface Ticket {
   created_at: string;
   updated_at: string;
   due_at: string;
+  resolution_due_at?: string | null;
+  resolution_due_version?: number;
+  resolution_overdue?: boolean;
+  resolution_review_version?: number;
+  resolution_confirmed_at?: string | null;
+  resolution_reviews?: ResolutionReview[];
   first_response_at: string | null;
   comments: Comment[];
   history: History[];
   attachments: Attachment[];
   attention_reasons?: AttentionReason[];
   last_activity_at?: string;
+}
+export interface ResolutionReview {
+  id: number;
+  ticket_id: number;
+  version: number;
+  author_id: number;
+  decision: "confirm" | "rework";
+  explanation: string;
+  resolution_snapshot: string | null;
+  created_at: string;
 }
 export interface Comment {
   id: number;
@@ -125,6 +141,7 @@ export interface History {
   field: string;
   old_value: string | null;
   new_value: string | null;
+  reason?: string | null;
   created_at: string;
 }
 export interface Attachment {
@@ -144,10 +161,11 @@ export interface Summary {
   repeated: Ticket[];
 }
 
-export type AttentionReason = "unassigned" | "overdue" | "stale";
+export type AttentionReason = "unassigned" | "overdue" | "resolution_overdue" | "stale";
 export const attentionLabels: Record<AttentionReason, string> = {
   unassigned: "Без ответственного",
   overdue: "Просрочен ответ",
+  resolution_overdue: "Просрочено решение",
   stale: "Без движения",
 };
 export interface AttentionSummary {

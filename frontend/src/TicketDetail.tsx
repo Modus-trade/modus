@@ -27,6 +27,9 @@ import { Badge, Failure, Loading } from "./components/common";
 import { AnimatedTabs } from "./components/motion";
 import { Button } from "./components/ui/button";
 import { AssigneeRecommendations } from "./components/AssigneeRecommendations";
+import ResolutionDeadline from "./components/ResolutionDeadline";
+import ResolutionReview from "./components/ResolutionReview";
+import { formatDeadline } from "./deadline";
 
 export default function TicketDetail({ user }: { user: User }) {
   const { id } = useParams();
@@ -70,6 +73,13 @@ export default function TicketDetail({ user }: { user: User }) {
   if (!t) return <Failure retry={() => query.refetch()} />;
   const manager = user.role !== "EMPLOYEE";
   const final = ["CLOSED", "IMPLEMENTED", "REJECTED"].includes(t.status);
+  function historyValue(field: string, value: string | null) {
+    if (field === "resolution_due_at") return value ? formatDeadline(value) : "Не назначен";
+    if (field === "resolution") return value || "Не указан";
+    if (field === "resolution_review") return value === "confirm" ? "Подтверждено автором" : value === "rework" ? "Возвращено на доработку" : "Ожидает проверки";
+    return statuses[value || ""] || priorities[value || ""] ||
+      people.data?.find((person) => String(person.id) === value)?.full_name || value || "Не назначен";
+  }
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -80,6 +90,8 @@ export default function TicketDetail({ user }: { user: User }) {
         assignee_id: assignee ? Number(assignee) : null,
         resolution,
         is_shared: shared,
+        expected_status: t?.status,
+        expected_resolution_review_version: t?.resolution_review_version ?? 0,
       });
       await qc.invalidateQueries();
       toast.success("Изменения сохранены");
@@ -220,6 +232,7 @@ export default function TicketDetail({ user }: { user: User }) {
               </label>
             )}
           </section>
+          <ResolutionReview ticket={t} user={user} />
           <section className="panel">
             <AnimatedTabs value={tab} label="Раздел обращения">
               <button
@@ -260,31 +273,18 @@ export default function TicketDetail({ user }: { user: User }) {
                                 priority: "Приоритет",
                                 assignee_id: "Ответственный",
                                 resolution: "Результат рассмотрения",
+                                resolution_due_at: "Срок решения",
+                                resolution_review: "Проверка результата",
                               }[h.field as "status"]
                             }
                             :{" "}
                             <span className="muted">
-                              {h.field === "resolution"
-                                ? h.old_value || "Не указан"
-                                : statuses[h.old_value || ""] ||
-                                  priorities[h.old_value || ""] ||
-                                  people.data?.find(
-                                    (u) => String(u.id) === h.old_value,
-                                  )?.full_name ||
-                                  h.old_value ||
-                                  "Не назначен"}
+                              {historyValue(h.field, h.old_value)}
                             </span>{" "}
                             →{" "}
-                            {h.field === "resolution"
-                              ? h.new_value || "Не указан"
-                              : statuses[h.new_value || ""] ||
-                                priorities[h.new_value || ""] ||
-                                people.data?.find(
-                                  (u) => String(u.id) === h.new_value,
-                                )?.full_name ||
-                                h.new_value ||
-                                "Не назначен"}
+                            {historyValue(h.field, h.new_value)}
                           </p>
+                          {h.reason && <p className="deadline-history-reason">Причина: {h.reason}</p>}
                           <small>{datetime(h.created_at)}</small>
                         </div>
                       </div>
@@ -397,6 +397,7 @@ export default function TicketDetail({ user }: { user: User }) {
               )}
             </dl>
           </section>
+          <ResolutionDeadline ticket={t} user={user} />
           {manager && t.status !== "CLOSED" && (
             <form className="panel padded form-stack" onSubmit={save}>
               <h3>Управление обращением</h3>
@@ -504,7 +505,7 @@ const STAGES = [
 function StageTracker({ status }: { status: string }) {
   const current = STAGES.findIndex((s) => s.statuses.includes(status));
   const last = current === STAGES.length - 1;
-  const outcome = status === "REJECTED" ? "Отклонено" : status === "IMPLEMENTED" ? "Реализовано" : status === "CLOSED" ? "Закрыто" : null;
+  const outcome = status === "REJECTED" ? "Отклонено" : status === "IMPLEMENTED" ? "Проверка автора" : status === "CLOSED" ? "Закрыто" : null;
   return (
     <ol className={`stage-tracker stage-${status}`} aria-label="Стадия обращения">
       {STAGES.map((s, i) => (

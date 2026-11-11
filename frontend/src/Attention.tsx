@@ -9,7 +9,6 @@ import {
   ChevronLeft,
   ChevronRight,
   CircleHelp,
-  Clock3,
   Radar,
   RefreshCw,
   Search,
@@ -46,12 +45,12 @@ const groups = [
     tone: "amber",
   },
   {
-    key: "stale",
-    label: "Без движения",
-    note: "Помогите процессу двигаться",
-    icon: Clock3,
-    action: "Посмотреть историю",
-    tone: "blue",
+    key: "resolution_overdue",
+    label: "Просрочено решение",
+    note: "Плановый срок уже истёк",
+    icon: AlarmClock,
+    action: "Проверить решение",
+    tone: "red",
   },
 ] as const;
 
@@ -61,14 +60,9 @@ export default function Attention() {
   const [reason, setReason] = useState<AttentionReason | "all">(
     initialReason === "unassigned" ||
       initialReason === "overdue" ||
-      initialReason === "stale"
+      initialReason === "resolution_overdue"
       ? initialReason
       : "all",
-  );
-  const [days, setDays] = useState(() =>
-    [3, 7, 14, 30].includes(Number(params.get("days")))
-      ? Number(params.get("days"))
-      : 7,
   );
   const [q, setQ] = useState(params.get("q") || "");
   const [priority, setPriority] = useState(() =>
@@ -82,22 +76,20 @@ export default function Attention() {
   useEffect(() => {
     const next = new URLSearchParams();
     if (reason !== "all") next.set("reason", reason);
-    if (days !== 7) next.set("days", String(days));
     if (q) next.set("q", q);
     if (priority) next.set("priority", priority);
     if (page !== 1) next.set("page", String(page));
     if (next.toString() !== params.toString())
       setParams(next, { replace: true });
-  }, [reason, days, q, priority, page, params, setParams]);
+  }, [reason, q, priority, page, params, setParams]);
   const query = useQuery<AttentionSummary>({
-    queryKey: ["attention", reason, days, q, priority, page],
+    queryKey: ["attention", reason, q, priority, page],
     queryFn: async ({ signal }) =>
       (
         await api.get("/analytics/attention", {
           signal,
           params: {
             reason,
-            stale_days: days,
             ...(q ? { q } : {}),
             ...(priority ? { priority } : {}),
             page,
@@ -188,8 +180,8 @@ export default function Attention() {
               </h2>
               <p>
                 {data.counts.total
-                  ? "Начните с обращений без ответственного и просроченного ответа. Остальные — держите в поле зрения."
-                  : "Открытые обращения распределены, сроки ответа соблюдены, длительных пауз нет."}
+                  ? "Проверьте обращения без ответственного и просроченные сроки ответа и решения."
+                  : "Открытые обращения распределены, назначенные сроки соблюдены, длительных пауз нет."}
               </p>
               <div className="attention-brief-footer">
                 <ShieldCheck size={15} />
@@ -241,15 +233,11 @@ export default function Attention() {
                     <Icon size={22} />
                   </span>
                   <span className="attention-card-count">
-                    {data.counts[key]}
+                    {data.counts[key] ?? 0}
                   </span>
                 </div>
                 <h3>{label}</h3>
-                <p>
-                  {key === "stale"
-                    ? `Нет активности ${days} дней и дольше`
-                    : note}
-                </p>
+                <p>{note}</p>
                 <span className="attention-card-action">
                   {action}
                   <ArrowRight size={17} />
@@ -263,23 +251,6 @@ export default function Attention() {
               Одно обращение может иметь несколько причин внимания. В списке оно
               появится один раз.
             </p>
-            <label>
-              Без движения
-              <select
-                aria-label="Период отсутствия активности"
-                value={days}
-                onChange={(e) => {
-                  setDays(Number(e.target.value));
-                  setPage(1);
-                }}
-              >
-                {[3, 7, 14, 30].map((n) => (
-                  <option key={n} value={n}>
-                    от {n} дней
-                  </option>
-                ))}
-              </select>
-            </label>
           </div>
           <section
             id="attention-queue"

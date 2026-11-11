@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { Bell, CheckCheck, CircleHelp, MessageSquare, Flag, UserCheck, BadgeCheck } from "lucide-react";
+import { Bell, CheckCheck, CircleHelp, MessageSquare, Flag, UserCheck, BadgeCheck, CalendarClock } from "lucide-react";
 import { api } from "../lib";
 import type { AppNotification, NotificationList } from "../realtime";
 
@@ -12,6 +12,11 @@ const ICONS: Record<string, typeof Bell> = {
   clarification: CircleHelp,
   status: Flag,
   result: BadgeCheck,
+  deadline_changed: CalendarClock,
+  resolution_reminder: CalendarClock,
+  resolution_overdue: CalendarClock,
+  resolution_confirmed: CheckCheck,
+  resolution_rework: MessageSquare,
 };
 
 function ago(iso: string) {
@@ -33,6 +38,7 @@ export default function NotificationBell() {
     queryKey: ["notifications"],
     queryFn: async () => (await api.get<NotificationList>("/notifications")).data,
     staleTime: 60000,
+    refetchInterval: 60000,
   });
   const unread = data?.unread_count ?? 0;
 

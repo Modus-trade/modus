@@ -104,7 +104,7 @@ export function TicketTable({
                   ? Lightbulb
                   : Heart;
             const urgent =
-              t.overdue &&
+              (t.overdue || t.resolution_overdue) &&
               !["IMPLEMENTED", "REJECTED", "CLOSED"].includes(t.status);
             const tone =
               t.status === "IMPLEMENTED"
@@ -144,7 +144,7 @@ export function TicketTable({
                         <span>·</span>
                         {types[t.type]}
                         {urgent && !attention && (
-                          <span className="overdue-label">Ответ просрочен</span>
+                          <span className="overdue-label">{t.resolution_overdue ? "Решение просрочено" : "Ответ просрочен"}</span>
                         )}
                       </span>
                       <Link className="ticket-title-link" to={ticketHref(t.id)}>
