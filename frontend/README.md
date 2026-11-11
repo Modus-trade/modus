@@ -18,12 +18,15 @@
 
 ## 🚀 Запуск у себя
 
-Нужен Node.js 22+. Сначала запустите бэкенд (см. README `modus-back`), затем:
+Нужен Node.js 22+. Сначала запустите бэкенд ([modus-back](https://github.com/Modus-trade/modus-back#-запуск-у-себя)), затем в отдельном терминале:
 
 ```bash
 npm ci
 npm run dev            # http://localhost:5173
 ```
+
+На Windows, если PowerShell пишет «выполнение сценариев отключено»: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned -Force`.
+Самый простой путь — весь проект сразу: [инструкция в modus](https://github.com/Modus-trade/modus#-запуск-у-себя).
 
 Запросы `/api` и WebSocket `/api/ws` проксируются на `http://127.0.0.1:8000`, поэтому cookie сессии работает как на боевом сайте.
 Вход: `employee@modus.demo`, `manager.procurement@modus.demo` или `admin@modus.demo`, пароль `demo1234`.
