@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Проверка из CI: сайт открылся, API доступен через него, демо-пользователь входит.
 set -euo pipefail
-URL=${1:-http://localhost:5173}
+URL=${1:-http://127.0.0.1:5173}
 for _ in $(seq 1 90); do curl -fs -o /dev/null "$URL" && break; sleep 2; done
 curl -fs "$URL" | grep -q 'id="root"' || { echo "Сайт не открылся"; exit 1; }
 for _ in $(seq 1 60); do curl -fs "$URL/api/health" >/dev/null && break; sleep 2; done

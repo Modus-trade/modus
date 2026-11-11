@@ -40,12 +40,12 @@ jobs:
       - name: "Шаг 5: сайт открывается, вход работает"
         run: |
           $ok = $false
-          foreach ($i in 1..60) { try { Invoke-WebRequest http://localhost:5173 -UseBasicParsing | Out-Null; $ok = $true; break } catch { Start-Sleep 2 } }
+          foreach ($i in 1..60) { try { Invoke-WebRequest http://127.0.0.1:5173 -UseBasicParsing -TimeoutSec 5 | Out-Null; $ok = $true; break } catch { Start-Sleep 2 } }
           if (-not $ok) { throw "Сайт не открылся" }
           $s = New-Object Microsoft.PowerShell.Commands.WebRequestSession
-          Invoke-RestMethod http://localhost:5173/api/auth/login -Method Post -WebSession $s -ContentType "application/json" `
-            -Headers @{ Origin = "http://localhost:5173" } -Body '{"email":"admin@modus.demo","password":"demo1234"}' | Out-Null
-          $t = Invoke-RestMethod http://localhost:5173/api/tickets -WebSession $s
+          Invoke-RestMethod http://127.0.0.1:5173/api/auth/login -Method Post -WebSession $s -ContentType "application/json" `
+            -Headers @{ Origin = "http://127.0.0.1:5173" } -Body '{"email":"admin@modus.demo","password":"demo1234"}' | Out-Null
+          $t = Invoke-RestMethod http://127.0.0.1:5173/api/tickets -WebSession $s
           if ($t.items.Count -lt 1) { throw "Нет демо-обращений" }
           "Вход выполнен, обращений: $($t.total)"
       - name: Логи при ошибке
@@ -77,7 +77,7 @@ jobs:
           npm ci
           nohup npm run dev > ../frontend.log 2>&1 &
       - name: Сайт открывается, вход работает
-        run: ./.github/check-site.sh http://localhost:5173
+        run: ./.github/check-site.sh http://127.0.0.1:5173
       - name: Тесты
         run: |
           (cd backend && .venv/bin/python -m pytest -q)
@@ -95,7 +95,7 @@ jobs:
       - name: docker compose up --build
         run: docker compose up -d --build
       - name: Сайт открывается, вход работает
-        run: ./.github/check-site.sh http://localhost:5173
+        run: ./.github/check-site.sh http://127.0.0.1:5173
       - name: Логи при ошибке
         if: failure()
         run: docker compose logs

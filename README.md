@@ -170,7 +170,7 @@ npm ci
 npm run dev
 ```
 
-**5. Откройте** http://localhost:5173 и войдите как `admin@modus.demo` с паролем `demo1234`.
+**5. Откройте** http://127.0.0.1:5173 и войдите как `admin@modus.demo` с паролем `demo1234`.
 
 **В следующий раз** установка не нужна. В первом терминале выполните `cd backend`, `.\.venv\Scripts\Activate.ps1`, `uvicorn app.main:app --port 8000`; во втором — `cd frontend`, `npm run dev`.
 
@@ -198,7 +198,7 @@ npm ci
 npm run dev
 ```
 
-Откройте http://localhost:5173 и войдите как `admin@modus.demo` / `demo1234`.
+Откройте http://127.0.0.1:5173 и войдите как `admin@modus.demo` / `demo1234`.
 На macOS после первой установки можно просто дважды кликнуть `start.command`: он запустит оба процесса.
 
 ### Docker
@@ -209,7 +209,7 @@ npm run dev
 docker compose up --build
 ```
 
-Первая сборка занимает несколько минут. Затем откройте http://localhost:5173 (Swagger: http://localhost:8000/docs). Остановить: `Ctrl+C`.
+Первая сборка занимает несколько минут. Затем откройте http://127.0.0.1:5173 (Swagger: http://127.0.0.1:8000/docs). Остановить: `Ctrl+C`.
 
 ### Если что-то не так
 
