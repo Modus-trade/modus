@@ -5,7 +5,7 @@
 > - [Modus-trade/modus-front](https://github.com/Modus-trade/modus-front) — React/Vite.
 >
 > Каждый пуш в `main` этих репозиториев проходит тесты, сам выкладывается на сервер
-> (https://modus.46.101.134.38.sslip.io) и копируется сюда, в папки `backend/` и `frontend/`.
+> (https://modus-trade.makquiz.site) и копируется сюда, в папки `backend/` и `frontend/`.
 > Эти две папки здесь **не редактируйте** — их перезапишет синхронизация. Общие файлы
 > (README, `compose.yaml`, `start.command`) правятся прямо в этом репозитории.
 
