@@ -82,7 +82,8 @@ export default function TicketDetail({ user }: { user: User }) {
     try {
       await api.post(`/tickets/${id}/comments`, {
         body,
-        is_clarification_request: clarify,
+        is_clarification_request:
+          clarify && t?.status !== "AWAITING_CLARIFICATION",
       });
       setBody("");
       setClarify(false);
@@ -161,20 +162,22 @@ export default function TicketDetail({ user }: { user: User }) {
                 </a>
               ))}
             </div>
-            <label className="attach-action">
-              <Paperclip size={15} />
-              Прикрепить файл
-              <input
-                type="file"
-                accept=".pdf,.png,.jpg,.docx,.xlsx,.txt"
-                disabled={busy}
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) upload(file);
-                  e.target.value = "";
-                }}
-              />
-            </label>
+            {!final && (
+              <label className="attach-action">
+                <Paperclip size={15} />
+                Прикрепить файл
+                <input
+                  type="file"
+                  accept=".pdf,.png,.jpg,.docx,.xlsx,.txt"
+                  disabled={busy}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) upload(file);
+                    e.target.value = "";
+                  }}
+                />
+              </label>
+            )}
           </section>
           <section className="panel">
             <div className="list-tabs">
@@ -288,7 +291,7 @@ export default function TicketDetail({ user }: { user: User }) {
                         placeholder="Напишите сообщение…"
                       />
                       <div className="comment-actions">
-                        {manager ? (
+                        {manager && t.status !== "AWAITING_CLARIFICATION" ? (
                           <label className="checkbox-label">
                             <input
                               type="checkbox"
