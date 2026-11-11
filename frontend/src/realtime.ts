@@ -5,18 +5,16 @@ import { toast } from "sonner";
 
 export type AppNotification = {
   id: number;
-  kind: "assigned" | "comment" | "clarification" | "status" | "result" | string;
-  title: string;
-  body: string;
+  kind: "assigned" | "created" | "comment" | "clarification" | "status" | "result" | string;
+  message: string;
   ticket_id: number;
   ticket_number: string | null;
-  ticket_title: string | null;
-  actor_name: string | null;
   created_at: string;
-  read: boolean;
+  read_at: string | null;
+  href: string;
 };
 
-export type NotificationList = { items: AppNotification[]; unread: number };
+export type NotificationList = { items: AppNotification[]; total: number; unread_count: number };
 
 type ServerEvent =
   | { type: "ticket_changed"; ticket_id: number; reason: string }
@@ -72,13 +70,17 @@ export function useRealtime(userId: number | undefined) {
           const n = event.notification;
           qc.setQueryData<NotificationList>(["notifications"], (old) =>
             old
-              ? { items: [n, ...old.items.filter((x) => x.id !== n.id)].slice(0, 30), unread: old.unread + 1 }
+              ? {
+                  items: [n, ...old.items.filter((x) => x.id !== n.id)].slice(0, 20),
+                  total: old.total + 1,
+                  unread_count: old.unread_count + 1,
+                }
               : old,
           );
           qc.invalidateQueries({ queryKey: ["notifications"] });
-          toast(n.title, {
-            description: n.body || n.ticket_title || undefined,
-            action: { label: "Открыть", onClick: () => navigate(`/tickets/${n.ticket_id}`) },
+          toast(n.message, {
+            description: n.ticket_number ? `Обращение ${n.ticket_number}` : undefined,
+            action: { label: "Открыть", onClick: () => navigate(n.href) },
           });
         }
       };

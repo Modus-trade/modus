@@ -197,9 +197,9 @@ export default function App() {
   useEffect(() => {
     if (!openedTicket || !me.data) return;
     const list = qc.getQueryData<NotificationList>(["notifications"]);
-    if (list && !list.items.some((n) => !n.read && String(n.ticket_id) === openedTicket)) return;
+    if (list && !list.items.some((n) => !n.read_at && String(n.ticket_id) === openedTicket)) return;
     api
-      .post(`/notifications/read-all?ticket_id=${openedTicket}`)
+      .post(`/notifications/read-ticket/${openedTicket}`)
       .then(() => qc.invalidateQueries({ queryKey: ["notifications"] }))
       .catch(() => undefined);
   }, [openedTicket, me.data, qc]);

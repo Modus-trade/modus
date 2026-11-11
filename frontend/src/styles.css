@@ -253,7 +253,7 @@ label small {
 }
 .brand > div > span {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   letter-spacing: 1.25px;
   color: #526b80;
@@ -3339,7 +3339,7 @@ textarea {
 }
 
 .brand > div > span {
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.03em;
   line-height: 1.4;
 }
@@ -3924,7 +3924,7 @@ main {
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 1.8px;
   color: #b7ccd9;
   margin-bottom: 19px;
@@ -3962,7 +3962,7 @@ main {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 10px;
+  font-size: 12px;
   color: #99b5c7;
   margin-top: 23px;
   flex-wrap: wrap;
@@ -3992,7 +3992,7 @@ main {
   transform: translateY(-3px);
 }
 .attention-total > span:first-child {
-  font-size: 11px;
+  font-size: 12px;
   color: #b2c9d8;
 }
 .attention-total strong {
@@ -4003,7 +4003,7 @@ main {
   color: #fff;
 }
 .attention-total > span:last-child {
-  font-size: 10px;
+  font-size: 12px;
   color: #b3cbd9;
   display: flex;
   gap: 20px;
@@ -4132,7 +4132,7 @@ main {
   font-weight: 600;
 }
 .attention-card p {
-  font-size: 11px;
+  font-size: 12px;
   color: #8397a8;
   margin-top: 7px;
 }
@@ -4141,7 +4141,7 @@ main {
   align-items: center;
   justify-content: space-between;
   color: var(--signal-ink);
-  font-size: 11px;
+  font-size: 12px;
   margin-top: 23px;
   padding-top: 17px;
   border-top: 1px solid #edf1f5;
@@ -4158,7 +4158,7 @@ main {
   gap: 8px;
   align-items: center;
   color: #8396a6;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.6;
 }
 .attention-explainer p svg {
@@ -4170,13 +4170,13 @@ main {
   gap: 11px;
   white-space: nowrap;
   color: #7890a2;
-  font-size: 11px;
+  font-size: 12px;
 }
 .attention-explainer select {
   width: 125px;
   margin: 0;
   background: #fff;
-  font-size: 11px;
+  font-size: 12px;
   padding: 8px 12px;
 }
 .attention-queue .panel-title {
@@ -4192,7 +4192,7 @@ main {
   line-height: 1.7;
 }
 .attention-queue .eyebrow {
-  font-size: 8px;
+  font-size: 12px;
   color: #8ba0b0;
   margin-bottom: 9px;
 }
@@ -4206,7 +4206,7 @@ main {
   padding-block: 17px;
 }
 .attention-queue .list-tabs .count-pill {
-  font-size: 9px;
+  font-size: 12px;
   min-width: 22px;
   text-align: center;
 }
@@ -4231,7 +4231,7 @@ main {
 .attention-results {
   margin-left: auto;
   color: #8a9dad;
-  font-size: 11px;
+  font-size: 12px;
   white-space: nowrap;
 }
 .attention-updating {
@@ -4291,7 +4291,7 @@ main {
   font-weight: 550;
 }
 .attention-integration p {
-  font-size: 11px;
+  font-size: 12px;
   margin-top: 4px;
   color: #8a9dad;
   line-height: 1.7;
@@ -4305,7 +4305,7 @@ main {
   table-layout: auto;
 }
 .refined-ticket-table th {
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.1px;
   background: #f8fafc;
   padding: 15px 17px;
@@ -4355,7 +4355,7 @@ main {
   min-width: 0;
 }
 .refined-ticket-table .ticket-meta {
-  font-size: 9px;
+  font-size: 12px;
   gap: 8px;
   margin-bottom: 6px;
 }
@@ -4378,7 +4378,7 @@ main {
 }
 .ticket-category {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   color: #92a5b5;
   margin-top: 6px;
   line-height: 1.5;
@@ -4395,7 +4395,7 @@ main {
   gap: 4px;
   padding: 4px 6px;
   border-radius: 5px;
-  font-size: 8px;
+  font-size: 12px;
   line-height: 1.5;
   white-space: nowrap;
 }
@@ -4423,7 +4423,7 @@ main {
   align-items: center;
   gap: 7px;
   white-space: nowrap;
-  font-size: 10px;
+  font-size: 12px;
   color: #8194a5;
 }
 .priority-chip .priority {
@@ -4438,26 +4438,26 @@ main {
 }
 .refined-ticket-table .ticket-assignee {
   gap: 8px;
-  font-size: 10px;
+  font-size: 12px;
   min-width: 130px;
 }
 .ticket-assignee .avatar.small {
   width: 29px;
   height: 29px;
   border-radius: 10px;
-  font-size: 9px;
+  font-size: 12px;
   border: 1px solid #dfe8f1;
   background: #edf3f9;
   color: #56788f;
 }
 .ticket-assignee strong {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 1.5;
   display: block;
 }
 .ticket-assignee small {
-  font-size: 8px;
+  font-size: 12px;
   color: #9caebc;
   margin-top: 4px;
 }
@@ -4467,18 +4467,18 @@ main {
   align-items: center;
   white-space: nowrap;
   color: #b6817c;
-  font-size: 10px;
+  font-size: 12px;
 }
 .ticket-date {
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
   color: #69879b;
-  font-size: 11px;
+  font-size: 12px;
 }
 .ticket-date small {
   display: block;
   color: #9dafbd;
-  font-size: 8px;
+  font-size: 12px;
   margin-top: 6px;
   max-width: 120px;
   white-space: normal;
@@ -4502,7 +4502,7 @@ main {
   box-shadow: 0 4px 10px #163e6008;
 }
 .refined-ticket-table .badge {
-  font-size: 9px;
+  font-size: 12px;
 }
 .attention-ticket-table {
   min-width: 920px;
@@ -4530,23 +4530,23 @@ main {
     font-size: 12px;
   }
   .refined-ticket-table .ticket-meta {
-    font-size: 10px;
+    font-size: 12px;
   }
   .ticket-category {
-    font-size: 11px;
+    font-size: 12px;
   }
   .signal-chip {
-    font-size: 9px;
+    font-size: 12px;
   }
   .ticket-assignee small,
   .ticket-date small {
-    font-size: 10px;
+    font-size: 12px;
   }
   .priority-chip {
     font-size: 12px;
   }
   .refined-ticket-table .badge {
-    font-size: 11px;
+    font-size: 12px;
   }
 }
 @media (max-width: 1100px) {
@@ -4595,7 +4595,7 @@ main {
     font-size: 24px;
   }
   .attention-brief-copy > p {
-    font-size: 11px;
+    font-size: 12px;
   }
   .attention-total {
     min-width: 0;
@@ -4605,12 +4605,12 @@ main {
     font-size: 47px;
   }
   .attention-total > span:last-child {
-    font-size: 9px;
+    font-size: 12px;
     gap: 5px;
     max-width: 110px;
   }
   .attention-brief-footer {
-    font-size: 9px;
+    font-size: 12px;
   }
   .attention-brief-footer > span {
     padding-left: 0;
@@ -4640,10 +4640,10 @@ main {
     line-height: 1.5;
   }
   .attention-card p {
-    font-size: 10px;
+    font-size: 12px;
   }
   .attention-card-action {
-    font-size: 10px;
+    font-size: 12px;
     gap: 8px;
     margin-top: 16px;
     padding-top: 14px;
@@ -4680,13 +4680,13 @@ main {
     font-size: 17px;
   }
   .attention-queue .text-link {
-    font-size: 10px;
+    font-size: 12px;
   }
   .attention-queue .list-tabs {
     gap: 19px;
   }
   .attention-queue .list-tabs button {
-    font-size: 11px;
+    font-size: 12px;
   }
   .attention-refresh {
     font-size: 0;
@@ -4720,7 +4720,7 @@ main {
     order: -1;
   }
   .attention-total > span:first-child {
-    font-size: 11px;
+    font-size: 12px;
   }
   .attention-total > span:last-child {
     max-width: none;
@@ -4769,7 +4769,7 @@ main {
     grid-column: 2;
     grid-row: 2;
     margin-top: 4px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .attention-card-action {
     display: none;
@@ -4785,7 +4785,7 @@ main {
     flex-wrap: wrap;
   }
   .attention-results {
-    font-size: 10px;
+    font-size: 12px;
   }
   .attention-brief-footer {
     margin-top: 16px;
@@ -4794,7 +4794,7 @@ main {
     align-items: flex-start;
   }
   .attention-integration p {
-    font-size: 10px;
+    font-size: 12px;
   }
 }
 .attention-queue {
@@ -5114,27 +5114,27 @@ main {
 .assignee-recommendations { padding: 15px; border-radius: 18px; border: 1px solid #dce6f2; background: linear-gradient(145deg, #f4f8ff, #f9fbfd); }
 .recommendation-heading { display: flex; align-items: center; gap: 7px; color: #305b80; }
 .recommendation-heading strong { font-size: 13px; }
-.recommendation-heading > span { margin-left: auto; font-size: 8px; letter-spacing: 1px; border-radius: 5px; padding: 4px 6px; color: #6d5da5; background: #eeeafa; }
-.recommendation-note { font-size: 10px; line-height: 1.7; color: #6c8195; margin: 10px 0 0; }
+.recommendation-heading > span { margin-left: auto; font-size: 12px; letter-spacing: 1px; border-radius: 5px; padding: 4px 6px; color: #6d5da5; background: #eeeafa; }
+.recommendation-note { font-size: 12px; line-height: 1.7; color: #6c8195; margin: 10px 0 0; }
 .recommendation-list { display: grid; gap: 10px; margin-top: 13px; }
 .recommendation-person { padding: 12px; text-align: left; background: #ffffffd9; border: 1px solid #dfe8f1; border-radius: 13px; transition: border-color 250ms, box-shadow 250ms, transform 250ms; }
 .recommendation-person:hover { border-color: #92b7d2; box-shadow: 0 5px 15px #2246650a; transform: translateY(-2px); }
 .recommendation-person.is-selected { border-color: #498d85; background: linear-gradient(145deg, #fff, #edf9f4); box-shadow: 0 0 0 1px #498d8530; }
 .recommendation-person:focus-visible { outline: 2px solid #356f9a; outline-offset: 3px; }
 .recommendation-person-top { display: flex; align-items: center; gap: 8px; }
-.recommendation-rank { font-size: 10px; color: #829bb0; }
+.recommendation-rank { font-size: 12px; color: #829bb0; }
 .recommendation-identity { flex: 1; min-width: 0; }
-.recommendation-identity strong { display: block; font-size: 11px; color: #264b67; overflow-wrap: anywhere; }
-.recommendation-identity small { display: block; font-size: 9px; color: #7a91a5; margin-top: 3px; }
+.recommendation-identity strong { display: block; font-size: 12px; color: #264b67; overflow-wrap: anywhere; }
+.recommendation-identity small { display: block; font-size: 12px; color: #7a91a5; margin-top: 3px; }
 .recommendation-score { color: #307c70; font-size: 23px; font-weight: 650; line-height: 1; }
-.recommendation-score small { display: block; font-size: 8px; color: #8499a7; text-align: right; margin-top: 4px; }
+.recommendation-score small { display: block; font-size: 12px; color: #8499a7; text-align: right; margin-top: 4px; }
 .recommendation-meter { display: block; height: 4px; border-radius: 8px; background: #eaf0f5; margin: 12px 0 10px; overflow: hidden; }
 .recommendation-meter i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #88b3d2, #4b9f8c); }
-.recommendation-metrics { display: flex; justify-content: space-between; gap: 5px; font-size: 8px; color: #748b9c; }
-.recommendation-metrics b { display: block; font-size: 11px; color: #3a6077; margin-top: 3px; font-weight: 550; }
-.recommendation-select { display: flex; align-items: center; gap: 5px; margin-top: 11px; padding-top: 9px; border-top: 1px solid #e7eef3; font-size: 10px; color: #376d91; }
+.recommendation-metrics { display: flex; justify-content: space-between; gap: 5px; font-size: 12px; color: #748b9c; }
+.recommendation-metrics b { display: block; font-size: 12px; color: #3a6077; margin-top: 3px; font-weight: 550; }
+.recommendation-select { display: flex; align-items: center; gap: 5px; margin-top: 11px; padding-top: 9px; border-top: 1px solid #e7eef3; font-size: 12px; color: #376d91; }
 .is-selected .recommendation-select { color: #26735f; }
-.recommendation-explanation { font-size: 10px; color: #6c8195; margin-top: 13px; line-height: 1.7; }
+.recommendation-explanation { font-size: 12px; color: #6c8195; margin-top: 13px; line-height: 1.7; }
 .recommendation-explanation summary { cursor: pointer; color: #426d8c; }
 .recommendation-explanation p { margin-top: 7px; }
 @media (prefers-reduced-motion: reduce) { .recommendation-person { transition: none; } .recommendation-person:hover { transform: none; } }
@@ -5220,7 +5220,7 @@ main {
   border-radius: 9px;
   background: var(--mint);
   color: #fff;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 18px;
   text-align: center;
@@ -5387,3 +5387,40 @@ main {
   position: relative;
   z-index: 50;
 }
+/* Shared problems: discover once, solve together. */
+.similar-problems { border: 1px solid #cbdfea; background: linear-gradient(135deg, #f1f8fd, #f1faf6); border-radius: 18px; padding: 18px; }
+.similar-heading { display: flex; align-items: center; gap: 8px; color: #2b657b; }
+.similar-heading strong, .similar-heading h3 { font-size: 14px; }
+.similar-problems > p, .joined-problems > p { font-size: 12px; line-height: 1.7; color: #6a8395; margin: 9px 0 13px; }
+.similar-problems > small { display: block; font-size: 12px; color: #738b9c; margin-top: 12px; line-height: 1.6; }
+.similar-list { display: grid; gap: 10px; }
+.similar-item { background: #ffffffd9; border: 1px solid #dae7ee; border-radius: 12px; padding: 13px; }
+.similar-item h4 { margin: 6px 0 10px; font-size: 13px; line-height: 1.6; color: #234b63; }
+.similar-item-footer { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+.affected-count { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 5px; color: #618096; font-size: 12px; margin-top: 7px; line-height: 1.6; }
+.affected-count.has-participants { color: #257b68; font-weight: 600; }
+.affected-count small { padding: 1px 5px; background: #e5f3ed; border-radius: 4px; font-size: 12px; color: #367c66; font-weight: 400; }
+.similar-feedback { font-size: 12px; color: #71899b; padding: 8px 0; }
+.shared-problem-toggle { display: flex !important; flex-direction: row !important; align-items: flex-start; gap: 10px !important; background: #f4f8fb; padding: 13px; border: 1px solid #dce7ef; border-radius: 12px; }
+.shared-problem-toggle input { width: 16px !important; height: 16px; min-height: 0; flex-shrink: 0; margin-top: 3px; accent-color: #337f75; }
+.shared-problem-toggle strong { display: block; font-size: 12px; color: #385d75; line-height: 1.6; }
+.shared-problem-toggle small { display: block; font-size: 12px; color: #71899a; line-height: 1.7; margin-top: 4px; }
+.joined-problems { padding: 22px; margin-bottom: 22px; }
+.joined-problems h3 span { color: #7999ab; margin-left: 8px; }
+.joined-problem-list article { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 14px 0; border-top: 1px solid #e7eef3; }
+.joined-problem-list article > strong { flex: 1; min-width: 170px; font-size: 12px; color: #345a70; }
+.joined-problem-list .ticket-number { font-size: 12px; color: #829aaa; }
+.joined-problem-list .affected-count { margin: 0; }
+.notification-bell { position: relative; }
+.notification-bell > span { position: absolute; top: -3px; right: -7px; min-width: 17px; padding: 2px 4px; border-radius: 12px; background: #e34453; color: white; font-size: 12px; box-shadow: 0 2px 8px #e3445325; }
+.notification-toolbar { display: flex; justify-content: space-between; gap: 12px; margin: 16px 0; }
+.notification-list { display: grid; gap: 8px; }
+.notification-item { display: flex; align-items: center; gap: 12px; padding: 16px; text-align: left; border: 1px solid #e1eaf2; border-radius: 14px; background: #fafcfe; transition: background .2s; width: 100%; }
+.notification-item.is-unread { background: linear-gradient(110deg,#edf5ff,#f2faf7); border-color: #c9dfea; }
+.notification-item:hover { background: #eaf3f9; }
+.notification-item > span:nth-child(2) { flex: 1; }
+.notification-item strong { display: block; font-size: 13px; color: #20465e; }
+.notification-item small { display: block; font-size: 12px; color: #718b9d; margin-top: 5px; }
+.notification-dot { width: 6px; height: 6px; border-radius: 50%; background: transparent; }
+.is-unread .notification-dot { background: #e34a57; }
+.notification-empty { padding: 35px 12px; text-align: center; color: #7891a3; font-size: 13px; }

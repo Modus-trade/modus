@@ -6,6 +6,7 @@ import {
   Lightbulb,
   Heart,
   UserRoundX,
+  Users,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -105,15 +106,16 @@ export function TicketTable({
             const urgent =
               t.overdue &&
               !["IMPLEMENTED", "REJECTED", "CLOSED"].includes(t.status);
-            const tone = t.status === "IMPLEMENTED"
-              ? "resolved"
-              : ["REJECTED", "CLOSED"].includes(t.status)
-                ? "neutral"
-                : urgent || t.priority === "HIGH"
-                  ? "critical"
-                  : t.priority === "MEDIUM"
-                    ? "moderate"
-                    : "calm";
+            const tone =
+              t.status === "IMPLEMENTED"
+                ? "resolved"
+                : ["REJECTED", "CLOSED"].includes(t.status)
+                  ? "neutral"
+                  : urgent || t.priority === "HIGH"
+                    ? "critical"
+                    : t.priority === "MEDIUM"
+                      ? "moderate"
+                      : "calm";
             return (
               <tr
                 key={t.id}
@@ -149,6 +151,15 @@ export function TicketTable({
                         {t.title}
                       </Link>
                       <span className="ticket-category">{t.category_name}</span>
+                      {t.type === "PROBLEM" && (
+                        <span
+                          className={`affected-count ${t.affected_count > 1 ? "has-participants" : ""}`}
+                        >
+                          <Users size={13} />
+                          Столкнулись: {t.affected_count || 1}
+                          {t.is_shared && <small>Общая проблема</small>}
+                        </span>
+                      )}
                       {attention && (
                         <div className="ticket-signals">
                           {t.attention_reasons?.map((r) => (

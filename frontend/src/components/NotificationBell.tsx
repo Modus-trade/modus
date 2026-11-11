@@ -7,6 +7,7 @@ import type { AppNotification, NotificationList } from "../realtime";
 
 const ICONS: Record<string, typeof Bell> = {
   assigned: UserCheck,
+  created: Bell,
   comment: MessageSquare,
   clarification: CircleHelp,
   status: Flag,
@@ -33,7 +34,7 @@ export default function NotificationBell() {
     queryFn: async () => (await api.get<NotificationList>("/notifications")).data,
     staleTime: 60000,
   });
-  const unread = data?.unread ?? 0;
+  const unread = data?.unread_count ?? 0;
 
   const readOne = useMutation({
     mutationFn: (id: number) => api.post(`/notifications/${id}/read`),
@@ -43,7 +44,7 @@ export default function NotificationBell() {
     mutationFn: () => api.post("/notifications/read-all"),
     onMutate: () =>
       qc.setQueryData<NotificationList>(["notifications"], (old) =>
-        old ? { unread: 0, items: old.items.map((n) => ({ ...n, read: true })) } : old,
+        old ? { ...old, unread_count: 0, items: old.items.map((n) => ({ ...n, read_at: n.read_at ?? new Date().toISOString() })) } : old,
       ),
     onSettled: () => qc.invalidateQueries({ queryKey: ["notifications"] }),
   });
@@ -61,16 +62,20 @@ export default function NotificationBell() {
   }, [open]);
 
   function go(n: AppNotification) {
-    if (!n.read) {
+    if (!n.read_at) {
       qc.setQueryData<NotificationList>(["notifications"], (old) =>
         old
-          ? { unread: Math.max(0, old.unread - 1), items: old.items.map((x) => (x.id === n.id ? { ...x, read: true } : x)) }
+          ? {
+              ...old,
+              unread_count: Math.max(0, old.unread_count - 1),
+              items: old.items.map((x) => (x.id === n.id ? { ...x, read_at: new Date().toISOString() } : x)),
+            }
           : old,
       );
       readOne.mutate(n.id);
     }
     setOpen(false);
-    navigate(`/tickets/${n.ticket_id}`);
+    navigate(n.href);
   }
 
   return (
@@ -99,19 +104,18 @@ export default function NotificationBell() {
               data.items.map((n) => {
                 const Icon = ICONS[n.kind] ?? Bell;
                 return (
-                  <button key={n.id} className={`bell-item ${n.read ? "" : "unread"}`} onClick={() => go(n)}>
+                  <button key={n.id} className={`bell-item ${n.read_at ? "" : "unread"}`} onClick={() => go(n)}>
                     <span className={`bell-icon kind-${n.kind}`}>
                       <Icon size={16} />
                     </span>
                     <span className="bell-text">
-                      <span className="bell-title">{n.title}</span>
-                      {n.body ? <span className="bell-body">{n.body}</span> : null}
+                      <span className="bell-title">{n.message}</span>
                       <span className="bell-meta">
-                        {n.actor_name ? `${n.actor_name} · ` : ""}
+                        {n.ticket_number ? `${n.ticket_number} · ` : ""}
                         {ago(n.created_at)}
                       </span>
                     </span>
-                    {!n.read ? <span className="bell-dot" aria-label="Не прочитано" /> : null}
+                    {!n.read_at ? <span className="bell-dot" aria-label="Не прочитано" /> : null}
                   </button>
                 );
               })
