@@ -107,6 +107,8 @@ export interface Ticket {
   comments: Comment[];
   history: History[];
   attachments: Attachment[];
+  attention_reasons?: AttentionReason[];
+  last_activity_at?: string;
 }
 export interface Comment {
   id: number;
@@ -137,4 +139,21 @@ export interface Summary {
   by_status: Record<string, number>;
   by_category: Record<string, number>;
   overdue_tickets: Ticket[];
+}
+
+export type AttentionReason = "unassigned" | "overdue" | "stale";
+export const attentionLabels: Record<AttentionReason, string> = {
+  unassigned: "Без ответственного",
+  overdue: "Просрочен ответ",
+  stale: "Без движения",
+};
+export interface AttentionSummary {
+  counts: Record<AttentionReason | "total", number>;
+  items: Ticket[];
+  total: number;
+  page: number;
+  page_size: number;
+  stale_days: number;
+  generated_at: string;
+  notifications: { enabled: boolean };
 }

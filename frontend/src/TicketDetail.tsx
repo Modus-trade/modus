@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
@@ -25,9 +25,16 @@ import {
 import { Badge, Failure, Loading } from "./components/common";
 import { AnimatedTabs } from "./components/motion";
 import { Button } from "./components/ui/button";
+import { AssigneeRecommendations } from "./components/AssigneeRecommendations";
 
 export default function TicketDetail({ user }: { user: User }) {
   const { id } = useParams();
+  const [params] = useSearchParams();
+  const returnTo = params.get("returnTo");
+  const fromAttention =
+    user.role === "ADMIN" &&
+    returnTo !== null &&
+    /^\/(?:\?[^#]*)?$/.test(returnTo);
   const qc = useQueryClient();
   const query = useQuery<Ticket>({
     queryKey: ["ticket", id],
@@ -112,8 +119,9 @@ export default function TicketDetail({ user }: { user: User }) {
   }
   return (
     <div className="page-enter">
-      <Link to="/tickets" className="back-link">
-        <ArrowLeft size={16} />К обращениям
+      <Link to={fromAttention ? returnTo! : "/tickets"} className="back-link">
+        <ArrowLeft size={16} />
+        {fromAttention ? "К очереди внимания" : "К обращениям"}
       </Link>
       <div className="detail-heading">
         <div>
@@ -401,6 +409,15 @@ export default function TicketDetail({ user }: { user: User }) {
                   ))}
                 </select>
               </label>
+              {user.role === "ADMIN" && !final && (
+                <AssigneeRecommendations
+                  people={people.data || []}
+                  categoryId={t.category_id}
+                  selected={assignee}
+                  onSelect={setAssignee}
+                  disabled={busy}
+                />
+              )}
               <label>
                 Результат рассмотрения
                 {["IMPLEMENTED", "REJECTED", "CLOSED"].includes(status) && (

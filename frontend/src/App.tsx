@@ -23,6 +23,7 @@ import {
   ArrowRight,
   CircleHelp,
   Unplug,
+  Radar,
 } from "lucide-react";
 import { toast } from "sonner";
 import { api, roles, errorMessage, type User } from "./lib";
@@ -31,6 +32,7 @@ import { clearSession } from "./session";
 import { Button } from "./components/ui/button";
 import { Loading } from "./components/common";
 import Dashboard from "./Dashboard";
+import Attention from "./Attention";
 import Tickets, { NewTicket } from "./Tickets";
 import TicketDetail from "./TicketDetail";
 import Administration from "./Administration";
@@ -203,7 +205,14 @@ export default function App() {
   const manager = user.role !== "EMPLOYEE";
   const admin = user.role === "ADMIN";
   const nav = [
-    ...(manager ? [{ path: "/", label: "Обзор", icon: LayoutDashboard }] : []),
+    ...(admin
+      ? [
+          { path: "/", label: "Требует внимания", icon: Radar },
+          { path: "/overview", label: "Аналитика", icon: LayoutDashboard },
+        ]
+      : manager
+        ? [{ path: "/", label: "Обзор", icon: LayoutDashboard }]
+        : []),
     {
       path: "/tickets",
       label: admin ? "Все обращения" : manager ? "Инбокс" : "Мои обращения",
@@ -361,10 +370,22 @@ export default function App() {
             <Route
               path="/"
               element={
-                manager ? (
+                admin ? (
+                  <Attention />
+                ) : manager ? (
                   <Dashboard user={user} onNew={() => setNewOpen(true)} />
                 ) : (
                   <Navigate to="/tickets" replace />
+                )
+              }
+            />
+            <Route
+              path="/overview"
+              element={
+                admin ? (
+                  <Dashboard user={user} onNew={() => setNewOpen(true)} />
+                ) : (
+                  <Navigate to="/" replace />
                 )
               }
             />

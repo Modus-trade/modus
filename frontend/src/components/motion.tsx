@@ -28,7 +28,7 @@ export function useRouteMotion() {
     const url = new URL(anchor.href);
     if (
       url.origin !== location.origin ||
-      !/^\/(?:tickets(?:\/\d+)?|unassigned|categories|users)?$/.test(
+      !/^\/(?:tickets(?:\/\d+)?|unassigned|categories|users|overview)?$/.test(
         url.pathname,
       ) ||
       url.hash ||
