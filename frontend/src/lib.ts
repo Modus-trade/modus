@@ -83,6 +83,8 @@ export interface Category {
   sort_order: number;
 }
 export interface Ticket {
+  is_shared: boolean;
+  affected_count: number;
   id: number;
   number: string;
   title: string;

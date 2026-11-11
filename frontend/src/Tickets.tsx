@@ -30,6 +30,8 @@ import { Button } from "./components/ui/button";
 import { Modal } from "./components/ui/dialog";
 import { Failure, Loading, TicketTable } from "./components/common";
 
+import { SimilarProblems, JoinedProblems } from "./components/SimilarProblems";
+
 export default function Tickets({
   user,
   onNew,
@@ -39,7 +41,9 @@ export default function Tickets({
   onNew: () => void;
   unassigned?: boolean;
 }) {
-  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [filters, setFilters] = useState<Record<string, string>>(
+    user.role === "EMPLOYEE" ? {} : { sort: "affected_count" },
+  );
   const [page, setPage] = useState(1);
   const [advanced, setAdvanced] = useState(false);
   const query = useQuery<{ items: Ticket[]; total: number }>({
@@ -101,6 +105,7 @@ export default function Tickets({
           Новое обращение
         </Button>
       </div>
+      {!unassigned && <JoinedProblems />}
       <div className="panel list-panel">
         <AnimatedTabs value={filters.status || ""} label="Статус обращений">
           <button
@@ -248,6 +253,7 @@ export default function Tickets({
                 value={filters.sort || "created_at"}
                 onChange={(e) => filter("sort", e.target.value)}
               >
+                <option value="affected_count">По числу столкнувшихся</option>
                 <option value="created_at">По дате создания</option>
                 <option value="updated_at">По обновлению</option>
                 <option value="due_at">По сроку ответа</option>
@@ -329,6 +335,7 @@ const ticketSchema = z.object({
     .min(10, "Опишите обращение подробнее, минимум 10 символов")
     .max(20000),
   proposed_solution: z.string().max(20000),
+  is_shared: z.boolean(),
 });
 type FormValues = z.infer<typeof ticketSchema>;
 export function NewTicket({
@@ -361,12 +368,17 @@ export function NewTicket({
       title: "",
       description: "",
       proposed_solution: "",
+      is_shared: false,
     },
   });
   async function submit(values: FormValues) {
+    if (busy) return;
     setBusy(true);
     try {
-      const { data } = await api.post("/tickets", values);
+      const { data } = await api.post("/tickets", {
+        ...values,
+        is_shared: values.type === "PROBLEM" && values.is_shared,
+      });
       let failed = 0;
       for (const file of files) {
         const form = new FormData();
@@ -463,6 +475,32 @@ export function NewTicket({
             <small className="form-error">{errors.description.message}</small>
           )}
         </label>
+        {watch("type") === "PROBLEM" && (
+          <>
+            <SimilarProblems
+              text={`${watch("title")} ${watch("description")}`}
+              categoryId={Number(watch("category_id"))}
+              enabled={open && !busy}
+              onBusyChange={setBusy}
+              onJoined={() => {
+                reset();
+                setFiles([]);
+                onClose();
+                navigate("/tickets");
+              }}
+            />
+            <label className="shared-problem-toggle">
+              <input type="checkbox" {...register("is_shared")} />
+              <span>
+                <strong>Общая проблема — разрешить присоединение</strong>
+                <small>
+                  Другие сотрудники увидят заголовок, статус и число участников.
+                  Не указывайте личные или закрытые сведения в заголовке.
+                </small>
+              </span>
+            </label>
+          </>
+        )}
         <label>
           Предполагаемое решение <span className="optional">необязательно</span>
           <textarea

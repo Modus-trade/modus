@@ -1,3 +1,4 @@
+import { Notifications } from "./components/Notifications";
 import { useState } from "react";
 import {
   NavLink,
@@ -323,6 +324,7 @@ export default function App() {
             <Menu size={20} />
           </button>
           <div className="topbar-right">
+            <Notifications />
             <div className="person">
               <span className="avatar">
                 {user.full_name

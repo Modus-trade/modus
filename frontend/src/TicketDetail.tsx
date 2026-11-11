@@ -52,10 +52,12 @@ export default function TicketDetail({ user }: { user: User }) {
   const [status, setStatus] = useState("");
   const [priority, setPriority] = useState("");
   const [assignee, setAssignee] = useState("");
+  const [shared, setShared] = useState(false);
   const [resolution, setResolution] = useState("");
   const t = query.data;
   useEffect(() => {
     if (t) {
+      setShared(t.is_shared);
       setStatus(t.status);
       setPriority(t.priority);
       setAssignee(t.assignee_id?.toString() || "");
@@ -75,6 +77,7 @@ export default function TicketDetail({ user }: { user: User }) {
         priority,
         assignee_id: assignee ? Number(assignee) : null,
         resolution,
+        is_shared: shared,
       });
       await qc.invalidateQueries();
       toast.success("Изменения сохранены");
@@ -140,6 +143,12 @@ export default function TicketDetail({ user }: { user: User }) {
         <div className="detail-main">
           <section className="panel padded">
             <h3>Описание обращения</h3>
+            {t.type === "PROBLEM" && (
+              <p className="affected-count has-participants">
+                Столкнулись: {t.affected_count || 1} ·{" "}
+                {t.is_shared ? "Общая проблема" : "Закрытое обращение"}
+              </p>
+            )}
             <p className="ticket-description">{t.description}</p>
             {t.proposed_solution && (
               <>
@@ -368,6 +377,23 @@ export default function TicketDetail({ user }: { user: User }) {
           {manager && t.status !== "CLOSED" && (
             <form className="panel padded form-stack" onSubmit={save}>
               <h3>Управление обращением</h3>
+              {t.type === "PROBLEM" && (
+                <label className="shared-problem-toggle">
+                  <input
+                    type="checkbox"
+                    checked={shared}
+                    disabled={t.is_shared}
+                    onChange={(e) => setShared(e.target.checked)}
+                  />
+                  <span>
+                    <strong>Общая проблема</strong>
+                    <small>
+                      Заголовок и статус будут доступны сотрудникам для
+                      присоединения. После публикации скрыть проблему нельзя.
+                    </small>
+                  </span>
+                </label>
+              )}
               <label>
                 Статус
                 <select

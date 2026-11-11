@@ -5174,3 +5174,41 @@ main {
     --page-padding-inline: 16px;
   }
 }
+
+/* Shared problems: discover once, solve together. */
+.similar-problems { border: 1px solid #cbdfea; background: linear-gradient(135deg, #f1f8fd, #f1faf6); border-radius: 18px; padding: 18px; }
+.similar-heading { display: flex; align-items: center; gap: 8px; color: #2b657b; }
+.similar-heading strong, .similar-heading h3 { font-size: 14px; }
+.similar-problems > p, .joined-problems > p { font-size: 11px; line-height: 1.7; color: #6a8395; margin: 9px 0 13px; }
+.similar-problems > small { display: block; font-size: 10px; color: #738b9c; margin-top: 12px; line-height: 1.6; }
+.similar-list { display: grid; gap: 10px; }
+.similar-item { background: #ffffffd9; border: 1px solid #dae7ee; border-radius: 12px; padding: 13px; }
+.similar-item h4 { margin: 6px 0 10px; font-size: 13px; line-height: 1.6; color: #234b63; }
+.similar-item-footer { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+.affected-count { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 5px; color: #618096; font-size: 10px; margin-top: 7px; line-height: 1.6; }
+.affected-count.has-participants { color: #257b68; font-weight: 600; }
+.affected-count small { padding: 1px 5px; background: #e5f3ed; border-radius: 4px; font-size: 8px; color: #367c66; font-weight: 400; }
+.similar-feedback { font-size: 11px; color: #71899b; padding: 8px 0; }
+.shared-problem-toggle { display: flex !important; flex-direction: row !important; align-items: flex-start; gap: 10px !important; background: #f4f8fb; padding: 13px; border: 1px solid #dce7ef; border-radius: 12px; }
+.shared-problem-toggle input { width: 16px !important; height: 16px; min-height: 0; flex-shrink: 0; margin-top: 3px; accent-color: #337f75; }
+.shared-problem-toggle strong { display: block; font-size: 11px; color: #385d75; line-height: 1.6; }
+.shared-problem-toggle small { display: block; font-size: 10px; color: #71899a; line-height: 1.7; margin-top: 4px; }
+.joined-problems { padding: 22px; margin-bottom: 22px; }
+.joined-problems h3 span { color: #7999ab; margin-left: 8px; }
+.joined-problem-list article { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 14px 0; border-top: 1px solid #e7eef3; }
+.joined-problem-list article > strong { flex: 1; min-width: 170px; font-size: 12px; color: #345a70; }
+.joined-problem-list .ticket-number { font-size: 10px; color: #829aaa; }
+.joined-problem-list .affected-count { margin: 0; }
+.notification-bell { position: relative; }
+.notification-bell > span { position: absolute; top: -3px; right: -7px; min-width: 17px; padding: 2px 4px; border-radius: 12px; background: #e34453; color: white; font-size: 9px; box-shadow: 0 2px 8px #e3445325; }
+.notification-toolbar { display: flex; justify-content: space-between; gap: 12px; margin: 16px 0; }
+.notification-list { display: grid; gap: 8px; }
+.notification-item { display: flex; align-items: center; gap: 12px; padding: 16px; text-align: left; border: 1px solid #e1eaf2; border-radius: 14px; background: #fafcfe; transition: background .2s; width: 100%; }
+.notification-item.is-unread { background: linear-gradient(110deg,#edf5ff,#f2faf7); border-color: #c9dfea; }
+.notification-item:hover { background: #eaf3f9; }
+.notification-item > span:nth-child(2) { flex: 1; }
+.notification-item strong { display: block; font-size: 13px; color: #20465e; }
+.notification-item small { display: block; font-size: 10px; color: #718b9d; margin-top: 5px; }
+.notification-dot { width: 6px; height: 6px; border-radius: 50%; background: transparent; }
+.is-unread .notification-dot { background: #e34a57; }
+.notification-empty { padding: 35px 12px; text-align: center; color: #7891a3; font-size: 13px; }
