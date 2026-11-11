@@ -23,6 +23,7 @@ import {
   type User,
 } from "./lib";
 import { Badge, Failure, Loading } from "./components/common";
+import { AnimatedTabs } from "./components/motion";
 import { Button } from "./components/ui/button";
 
 export default function TicketDetail({ user }: { user: User }) {
@@ -180,9 +181,10 @@ export default function TicketDetail({ user }: { user: User }) {
             )}
           </section>
           <section className="panel">
-            <div className="list-tabs">
+            <AnimatedTabs value={tab} label="Раздел обращения">
               <button
                 className={tab === "comments" ? "selected" : ""}
+                aria-pressed={tab === "comments"}
                 onClick={() => setTab("comments")}
               >
                 <MessageSquare size={15} />
@@ -191,13 +193,14 @@ export default function TicketDetail({ user }: { user: User }) {
               </button>
               <button
                 className={tab === "history" ? "selected" : ""}
+                aria-pressed={tab === "history"}
                 onClick={() => setTab("history")}
               >
                 <HistoryIcon size={15} />
                 История изменений
               </button>
-            </div>
-            <div className="discussion">
+            </AnimatedTabs>
+            <div className="discussion tab-content" key={tab}>
               {tab === "history" ? (
                 <div className="timeline">
                   {t.history.length === 0 ? (
@@ -308,7 +311,7 @@ export default function TicketDetail({ user }: { user: User }) {
                         ) : (
                           <span />
                         )}
-                        <Button disabled={busy || !body.trim()}>
+                        <Button loading={busy} disabled={busy || !body.trim()}>
                           <Send size={15} />
                           Отправить
                         </Button>
@@ -413,7 +416,7 @@ export default function TicketDetail({ user }: { user: User }) {
                   placeholder="Решение, обоснование и предпринятые действия"
                 />
               </label>
-              <Button className="full" disabled={busy}>
+              <Button className="full" loading={busy} disabled={busy}>
                 {busy ? "Сохраняем…" : "Сохранить изменения"}
               </Button>
             </form>

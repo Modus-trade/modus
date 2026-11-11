@@ -331,7 +331,9 @@ export default function Administration({
             >
               Отмена
             </Button>
-            <Button disabled={busy}>{busy ? "Сохраняем…" : "Сохранить"}</Button>
+            <Button loading={busy} disabled={busy}>
+              {busy ? "Сохраняем…" : "Сохранить"}
+            </Button>
           </div>
         </form>
       </Modal>

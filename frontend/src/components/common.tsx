@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { statuses, types, date, type Ticket } from "../lib";
 export function Badge({ status }: { status: string }) {
   return (
-    <span className={`badge status-${status}`}>
+    <span key={status} className={`badge status-${status}`}>
       <i />
       {statuses[status]}
     </span>
@@ -26,7 +26,7 @@ export function Empty({
 }
 export function Loading() {
   return (
-    <div className="skeletons">
+    <div className="skeletons" role="status" aria-label="Загрузка данных">
       {[1, 2, 3, 4].map((i) => (
         <div className="skeleton" key={i} />
       ))}

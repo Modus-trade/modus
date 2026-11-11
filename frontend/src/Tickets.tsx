@@ -25,6 +25,7 @@ import {
   type Ticket,
   type User,
 } from "./lib";
+import { AnimatedTabs, Disclosure } from "./components/motion";
 import { Button } from "./components/ui/button";
 import { Modal } from "./components/ui/dialog";
 import { Failure, Loading, TicketTable } from "./components/common";
@@ -101,32 +102,36 @@ export default function Tickets({
         </Button>
       </div>
       <div className="panel list-panel">
-        <div className="list-tabs">
+        <AnimatedTabs value={filters.status || ""} label="Статус обращений">
           <button
             className={!filters.status ? "selected" : ""}
+            aria-pressed={!filters.status}
             onClick={() => filter("status", "")}
           >
             Все обращения
           </button>
           <button
             className={filters.status === "NEW" ? "selected" : ""}
+            aria-pressed={filters.status === "NEW"}
             onClick={() => filter("status", "NEW")}
           >
             Новые
           </button>
           <button
             className={filters.status === "IN_PROGRESS" ? "selected" : ""}
+            aria-pressed={filters.status === "IN_PROGRESS"}
             onClick={() => filter("status", "IN_PROGRESS")}
           >
             В работе
           </button>
           <button
             className={filters.status === "CLOSED" ? "selected" : ""}
+            aria-pressed={filters.status === "CLOSED"}
             onClick={() => filter("status", "CLOSED")}
           >
             Закрытые
           </button>
-        </div>
+        </AnimatedTabs>
         <div className="filterbar">
           <div className="search-input">
             <Search size={17} />
@@ -163,13 +168,15 @@ export default function Tickets({
           </select>
           <button
             className={`button button-outline ${advanced ? "filter-active" : ""}`}
+            aria-expanded={advanced}
+            aria-controls="advanced-filters"
             onClick={() => setAdvanced(!advanced)}
           >
             <SlidersHorizontal size={16} />
             Фильтры
           </button>
         </div>
-        {advanced && (
+        <Disclosure open={advanced} id="advanced-filters">
           <div className="advanced-filters">
             <label>
               Категория
@@ -269,14 +276,20 @@ export default function Tickets({
               <X size={14} />
             </button>
           </div>
-        )}
-        {query.isPending ? (
-          <Loading />
-        ) : query.isError ? (
-          <Failure retry={() => query.refetch()} />
-        ) : (
-          <TicketTable tickets={query.data.items} />
-        )}
+        </Disclosure>
+        <div
+          className="tab-content"
+          key={`${filters.status || "all"}:${page}:${query.status}`}
+          aria-busy={query.isFetching}
+        >
+          {query.isPending ? (
+            <Loading />
+          ) : query.isError ? (
+            <Failure retry={() => query.refetch()} />
+          ) : (
+            <TicketTable tickets={query.data.items} />
+          )}
+        </div>
         <div className="pagination">
           <span>Найдено: {query.data?.total ?? 0} обращений</span>
           <div>
@@ -491,7 +504,7 @@ export function NewTicket({
           >
             Отмена
           </Button>
-          <Button disabled={busy}>
+          <Button loading={busy} disabled={busy}>
             {busy ? "Отправляем…" : "Отправить обращение"}
           </Button>
         </div>

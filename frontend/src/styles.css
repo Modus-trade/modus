@@ -3591,3 +3591,313 @@ textarea {
     margin-left: auto;
   }
 }
+
+/* Shared motion: stable navigation, short feedback, and explicit exit states. */
+:root {
+  --sidebar-width: 280px;
+  --motion-fast: 160ms;
+  --motion-normal: 240ms;
+  --motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.sidebar {
+  width: var(--sidebar-width);
+}
+.main-shell {
+  margin-left: var(--sidebar-width);
+}
+.nav-item,
+.nav-item.active {
+  font-size: 15px;
+  font-weight: 600;
+  min-height: 50px;
+  transform: none;
+  transition:
+    background var(--motion-fast),
+    color var(--motion-fast),
+    border-color var(--motion-fast);
+}
+.nav-item:hover,
+.nav-item:active {
+  transform: none;
+}
+.nav-label {
+  white-space: nowrap;
+  overflow-wrap: normal;
+  hyphens: none;
+}
+.nav-item.active::before {
+  animation: fade-in var(--motion-normal) both;
+}
+.list-tabs button {
+  font-weight: 600;
+}
+.button,
+.icon-button,
+.demo-roles button {
+  transition:
+    background var(--motion-fast),
+    color var(--motion-fast),
+    border-color var(--motion-fast),
+    box-shadow var(--motion-fast),
+    transform var(--motion-fast);
+}
+.button-primary:hover {
+  transform: translateY(-1px);
+}
+.button:active:not(:disabled),
+.icon-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.button:disabled {
+  transform: none;
+}
+.button-spinner {
+  animation: spin 800ms linear infinite;
+}
+.button[aria-busy="true"] {
+  opacity: 0.8;
+  cursor: progress;
+}
+.page-enter {
+  animation: content-in 300ms var(--motion-ease) both;
+}
+.login-form,
+.empty,
+.skeletons {
+  animation: content-in 240ms var(--motion-ease) both;
+}
+.metric:hover {
+  transform: translateY(-2px);
+}
+.metrics > .metric {
+  animation-duration: 320ms;
+}
+.metrics > .metric:nth-child(2) {
+  animation-delay: 40ms;
+}
+.metrics > .metric:nth-child(3) {
+  animation-delay: 80ms;
+}
+.metrics > .metric:nth-child(4) {
+  animation-delay: 120ms;
+}
+tbody tr {
+  animation: fade-in 240ms ease-out both;
+}
+tbody tr:nth-child(2) {
+  animation-delay: 25ms;
+}
+tbody tr:nth-child(3) {
+  animation-delay: 50ms;
+}
+tbody tr:nth-child(4) {
+  animation-delay: 75ms;
+}
+tbody tr:nth-child(n + 5) {
+  animation-delay: 100ms;
+}
+.comment,
+.timeline-item,
+.attachment,
+.badge,
+.form-error {
+  animation: fade-in 220ms ease-out both;
+}
+.disclosure {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--motion-normal) var(--motion-ease),
+    opacity var(--motion-fast),
+    visibility 0s var(--motion-normal);
+}
+.disclosure[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.disclosure-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+.modal-overlay[data-state="open"] {
+  animation: fade-in 200ms ease-out both;
+}
+.modal-overlay[data-state="closed"] {
+  animation: fade-out 160ms ease-in both;
+}
+.modal[data-state="open"] {
+  animation: dialog-in 240ms var(--motion-ease) both;
+}
+.modal[data-state="closed"] {
+  animation: dialog-out 160ms ease-in both;
+}
+.fetch-progress {
+  position: fixed;
+  inset: 0 0 auto;
+  height: 3px;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0;
+  overflow: hidden;
+  transition: opacity 200ms;
+}
+.fetch-progress[data-active="true"] {
+  opacity: 1;
+  transition-delay: 120ms;
+}
+.fetch-progress::after {
+  content: "";
+  display: block;
+  width: 35%;
+  height: 100%;
+  background: var(--red);
+}
+.fetch-progress[data-active="true"]::after {
+  animation: progress-sweep 1.2s ease-in-out infinite;
+}
+main {
+  view-transition-name: modus-content;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+::view-transition-old(modus-content) {
+  animation: content-out 150ms ease-in both;
+}
+::view-transition-new(modus-content) {
+  animation: content-in 240ms var(--motion-ease) both;
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes content-in {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes content-out {
+  from {
+    opacity: 1;
+    translate: 0 0;
+  }
+  to {
+    opacity: 0;
+    translate: 0 -5px;
+  }
+}
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+    scale: 0.98;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+}
+@keyframes dialog-out {
+  from {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+  to {
+    opacity: 0;
+    translate: 0 5px;
+    scale: 0.98;
+  }
+}
+@keyframes spin {
+  to {
+    rotate: 360deg;
+  }
+}
+@keyframes progress-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(390%);
+  }
+}
+@media (max-width: 680px) {
+  .sidebar {
+    width: min(var(--sidebar-width), calc(100vw - 24px));
+    transition: transform var(--motion-normal) var(--motion-ease);
+  }
+  .main-shell {
+    margin-left: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* One persistent underline moves between tabs instead of remounting on selection. */
+.animated-tabs {
+  position: relative;
+}
+.animated-tabs button,
+.animated-tabs button.selected {
+  border-bottom-color: transparent;
+  flex-shrink: 0;
+}
+.tab-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: var(--red);
+  pointer-events: none;
+  transition:
+    transform 280ms var(--motion-ease),
+    width 280ms var(--motion-ease),
+    opacity 160ms;
+}
+.tab-content {
+  animation: content-in 260ms var(--motion-ease) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tab-indicator {
+    transition: none;
+  }
+  .tab-content {
+    animation: none;
+  }
+}

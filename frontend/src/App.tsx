@@ -5,8 +5,9 @@ import {
   Route,
   Routes,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useIsFetching, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowUpRight,
   LayoutDashboard,
@@ -14,6 +15,7 @@ import {
   Layers3,
   Users,
   LogOut,
+  LoaderCircle,
   Menu,
   X,
   Sparkles,
@@ -24,6 +26,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { api, roles, errorMessage, type User } from "./lib";
+import { Disclosure, useRouteMotion } from "./components/motion";
+import { clearSession } from "./session";
 import { Button } from "./components/ui/button";
 import { Loading } from "./components/common";
 import Dashboard from "./Dashboard";
@@ -132,7 +136,7 @@ function Login() {
                 {error}
               </p>
             )}
-            <Button disabled={busy} className="full">
+            <Button loading={busy} disabled={busy} className="full">
               {busy ? "Входим…" : "Войти"}
               <ArrowRight size={18} />
             </Button>
@@ -174,15 +178,19 @@ function Login() {
 
 export default function App() {
   const qc = useQueryClient();
-  const me = useQuery<User>({
+  const me = useQuery<User | null>({
     queryKey: ["me"],
-    queryFn: async () => (await api.get("/auth/me")).data,
+    queryFn: async ({ signal }) => (await api.get("/auth/me", { signal })).data,
     retry: false,
   });
   const [mobile, setMobile] = useState(false);
   const [newOpen, setNewOpen] = useState(false);
   const [help, setHelp] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const [loggingOut, setLoggingOut] = useState(false);
+  const routeMotion = useRouteMotion();
+  const fetching = useIsFetching();
   if (me.isPending)
     return (
       <div className="startup">
@@ -210,15 +218,28 @@ export default function App() {
       : []),
   ];
   async function logout() {
+    if (loggingOut) return;
+    setLoggingOut(true);
     try {
       await api.post("/auth/logout");
-      qc.clear();
+      await clearSession(qc);
+      setMobile(false);
+      setNewOpen(false);
+      setHelp(false);
+      navigate("/", { replace: true });
     } catch (e) {
       toast.error(errorMessage(e));
+    } finally {
+      setLoggingOut(false);
     }
   }
   return (
-    <div className="app">
+    <div className="app" onClickCapture={routeMotion}>
+      <div
+        className="fetch-progress"
+        data-active={fetching > 0}
+        aria-hidden="true"
+      />
       <aside className={`sidebar ${mobile ? "mobile-open" : ""}`}>
         <Logo />
         <button
@@ -262,16 +283,21 @@ export default function App() {
               <ArrowUpRight size={15} />
             </button>
           </div>
-          <button className="help-link" onClick={() => setHelp(!help)}>
+          <button
+            className="help-link"
+            aria-expanded={help}
+            aria-controls="help-content"
+            onClick={() => setHelp(!help)}
+          >
             <CircleHelp size={17} />
             Как это работает
           </button>
-          {help && (
+          <Disclosure open={help} id="help-content">
             <p className="help-text">
               Создайте обращение. Категория определит ответственного. В карточке
               вы увидите статус, уточнения и результат рассмотрения.
             </p>
-          )}
+          </Disclosure>
           <div className="sidebar-company">
             <span className="live-dot" />
             ГК «Модус Трейд»<span>v1.0</span>
@@ -317,13 +343,20 @@ export default function App() {
             <button
               className="icon-button logout"
               title="Выйти"
+              aria-label={loggingOut ? "Выходим…" : "Выйти"}
+              aria-busy={loggingOut}
+              disabled={loggingOut}
               onClick={logout}
             >
-              <LogOut size={18} />
+              {loggingOut ? (
+                <LoaderCircle size={18} className="button-spinner" />
+              ) : (
+                <LogOut size={18} />
+              )}
             </button>
           </div>
         </header>
-        <main>
+        <main key={location.pathname}>
           <Routes>
             <Route
               path="/"
