@@ -24,7 +24,7 @@
 - [Что умеет система](#-что-умеет-система)
 - [Как устроено](#-как-устроено)
 - [Репозитории и процесс разработки](#-репозитории-и-процесс-разработки)
-- [Запуск у себя](#-запуск-у-себя)
+- [Запуск у себя](#-запуск-у-себя) · [с нуля на Windows](#с-нуля-на-windows)
 - [Проверки](#-проверки)
 - [Документация](#-документация)
 
@@ -128,7 +128,52 @@ flowchart LR
 
 Локально ничего настраивать не нужно: без переменных окружения бэкенд создаёт свою SQLite-базу с демо-данными. Боевая база при этом не затрагивается.
 
-### Docker (одной командой)
+### С нуля на Windows
+
+> Просто посмотреть систему можно без установки: откройте **https://modus-trade.makquiz.site**.
+
+**1. Установите программы** (один раз, в PowerShell):
+
+```powershell
+winget install Git.Git Python.Python.3.12 OpenJS.NodeJS.LTS
+```
+
+Закройте и снова откройте PowerShell или VS Code, чтобы программы стали доступны в терминале.
+
+**2. Скачайте проект.** В VS Code: `Ctrl+Shift+P` → **Git: Clone** → `https://github.com/Modus-trade/modus` → войдите в GitHub, если появится запрос. Или из терминала:
+
+```powershell
+git clone https://github.com/Modus-trade/modus.git
+cd modus
+```
+
+**3. Запустите бэкенд** (терминал VS Code: `` Ctrl+` ``):
+
+```powershell
+cd backend
+py -3.12 -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+alembic upgrade head
+python seed.py
+uvicorn app.main:app --port 8000
+```
+
+> Если PowerShell пишет, что запуск скриптов запрещён: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, затем повторите `activate`.
+
+**4. Запустите сайт** во втором терминале (кнопка **+** в панели терминала):
+
+```powershell
+cd frontend
+npm ci
+npm run dev
+```
+
+**5. Откройте** http://localhost:5173 и войдите как `admin@modus.demo` с паролем `demo1234`.
+
+В следующий раз достаточно шагов 3 и 4 без установки: `.\.venv\Scripts\activate` → `uvicorn app.main:app --port 8000` и `npm run dev`.
+
+### Docker (если установлен Docker Desktop)
 
 ```sh
 docker compose up --build
@@ -136,7 +181,7 @@ docker compose up --build
 
 Сайт: http://127.0.0.1:5173 · Swagger: http://127.0.0.1:8000/docs
 
-### Без Docker
+### macOS / Linux без Docker
 
 Нужны Python 3.12+ и Node.js 22+.
 
