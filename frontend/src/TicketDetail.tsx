@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -53,6 +54,7 @@ export default function TicketDetail({ user }: { user: User }) {
   const [priority, setPriority] = useState("");
   const [assignee, setAssignee] = useState("");
   const [shared, setShared] = useState(false);
+  const [photo, setPhoto] = useState<number | null>(null);
   const [resolution, setResolution] = useState("");
   const t = query.data;
   useEffect(() => {
@@ -166,21 +168,41 @@ export default function TicketDetail({ user }: { user: User }) {
                 <p>{t.resolution}</p>
               </div>
             )}
+            {t.attachments.some((a) => isImage(a.filename)) && (
+              <div className="photo-grid">
+                {t.attachments
+                  .filter((a) => isImage(a.filename))
+                  .map((a) => (
+                    <button
+                      key={a.id}
+                      type="button"
+                      className="photo-thumb"
+                      onClick={() => setPhoto(a.id)}
+                      aria-label={`Открыть фото ${a.filename}`}
+                    >
+                      <img src={`/api/attachments/${a.id}`} alt={a.filename} loading="lazy" />
+                    </button>
+                  ))}
+              </div>
+            )}
             <div className="attachment-list">
-              {t.attachments.map((a) => (
-                <a
-                  href={`/api/attachments/${a.id}`}
-                  key={a.id}
-                  className="attachment"
-                >
-                  <Paperclip size={16} />
-                  <span>
-                    {a.filename}
-                    <small>{(a.size_bytes / 1024).toFixed(1)} КБ</small>
-                  </span>
-                </a>
-              ))}
+              {t.attachments
+                .filter((a) => !isImage(a.filename))
+                .map((a) => (
+                  <a
+                    href={`/api/attachments/${a.id}`}
+                    key={a.id}
+                    className="attachment"
+                  >
+                    <Paperclip size={16} />
+                    <span>
+                      {a.filename}
+                      <small>{(a.size_bytes / 1024).toFixed(1)} КБ</small>
+                    </span>
+                  </a>
+                ))}
             </div>
+            {photo !== null && <PhotoViewer id={photo} onClose={() => setPhoto(null)} />}
             {!final && (
               <label className="attach-action">
                 <Paperclip size={15} />
@@ -495,5 +517,35 @@ function StageTracker({ status }: { status: string }) {
         </li>
       ))}
     </ol>
+  );
+}
+
+const isImage = (name: string) => /\.(jpe?g|png|gif|webp|heic)$/i.test(name);
+
+/** Фото на весь экран: закрывается кликом по фону, крестиком или Esc. */
+function PhotoViewer({ id, onClose }: { id: number; onClose: () => void }) {
+  useEffect(() => {
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", esc);
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", esc);
+      document.body.style.overflow = overflow;
+    };
+  }, [onClose]);
+  return createPortal(
+    <div className="photo-viewer" role="dialog" aria-label="Просмотр фото" onClick={onClose}>
+      <img src={`/api/attachments/${id}`} alt="" onClick={(e) => e.stopPropagation()} />
+      <div className="photo-viewer-bar" onClick={(e) => e.stopPropagation()}>
+        <a href={`/api/attachments/${id}`} download>
+          Скачать
+        </a>
+        <button type="button" onClick={onClose}>
+          Закрыть
+        </button>
+      </div>
+    </div>,
+    document.body,
   );
 }
