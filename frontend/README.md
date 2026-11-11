@@ -1,9 +1,22 @@
-# Модус Трейд — сайт
+<div align="center">
 
-Веб-интерфейс системы обратной связи сотрудников. Работает с API из [modus-back](https://github.com/Modus-trade/modus-back).
-Демо: https://modus-trade.makquiz.site · Полный проект и документация: [Modus-trade/modus](https://github.com/Modus-trade/modus)
+<img src=".github/banner.svg" alt="Модус Трейд" width="720">
 
-## Запуск у себя
+<br><br>
+
+**Веб-интерфейс системы обратной связи сотрудников.**<br>Подача обращений, входящие руководителя, аналитика и администрирование.
+
+<br>
+
+**[🌐 Демо](https://modus-trade.makquiz.site)** &nbsp;·&nbsp; **[⭐ Весь проект](https://github.com/Modus-trade/modus)** &nbsp;·&nbsp; **[⚙️ Бэкенд](https://github.com/Modus-trade/modus-back)**
+
+<sub>React 18 · TypeScript · Vite · TanStack Query · Tailwind</sub>
+
+</div>
+
+<br>
+
+## 🚀 Запуск у себя
 
 Нужен Node.js 22+. Сначала запустите бэкенд (см. README `modus-back`), затем:
 
@@ -27,7 +40,7 @@ API_TARGET=http://127.0.0.1:8001
 | `npm test` | тесты |
 | `npm run build` | проверка TypeScript и сборка в `dist/` |
 
-## Структура
+## 📂 Структура
 
 ```text
 src/
@@ -45,7 +58,7 @@ public/                 логотип, favicon, шрифт Manrope
 
 Стек: React 18, TypeScript, Vite, TanStack Query, React Router, React Hook Form + Zod, Recharts, Tailwind.
 
-## Деплой
+## 🔄 Деплой
 
 Пуш в `main` запускает GitHub Actions:
 1. тесты и сборка;
