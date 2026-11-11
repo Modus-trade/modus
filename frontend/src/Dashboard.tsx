@@ -271,51 +271,60 @@ export default function Dashboard({
             <p>Распределение по категориям</p>
           </div>
         </div>
-        <ResponsiveContainer
-          width="100%"
-          height={Math.max(220, Object.keys(d.by_category).length * 32)}
+        <div
+          className="category-chart-scroll"
+          tabIndex={0}
+          role="region"
+          aria-label="График тем обращений — горизонтальная прокрутка"
         >
-          <BarChart
-            layout="vertical"
-            data={Object.entries(d.by_category).map(([name, value]) => ({
-              name,
-              value,
-            }))}
-            margin={{ left: 0, right: 25 }}
-          >
-            <CartesianGrid stroke="#12334d0d" horizontal={false} />
-            <XAxis
-              type="number"
-              allowDecimals={false}
-              tick={{ fill: "#708194", fontSize: 11 }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              type="category"
-              dataKey="name"
-              width={230}
-              tick={{ fill: "#587087", fontSize: 11 }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <Tooltip
-              cursor={{ fill: "#12334d05" }}
-              contentStyle={{
-                background: "#ffffff",
-                border: "1px solid #e0e6ee",
-                borderRadius: 10,
-              }}
-            />
-            <Bar
-              dataKey="value"
-              name="Обращения"
-              fill="#153e5e"
-              radius={[0, 4, 4, 0]}
-              barSize={10}
-            />
-          </BarChart>
-        </ResponsiveContainer>
+          <div className="category-chart-canvas">
+            <ResponsiveContainer
+              width="100%"
+              height={Math.max(240, Object.keys(d.by_category).length * 44)}
+            >
+              <BarChart
+                layout="vertical"
+                data={Object.entries(d.by_category).map(([name, value]) => ({
+                  name,
+                  value,
+                }))}
+                margin={{ left: 0, right: 25 }}
+              >
+                <CartesianGrid stroke="#12334d0d" horizontal={false} />
+                <XAxis
+                  type="number"
+                  allowDecimals={false}
+                  tick={{ fill: "#526b80", fontSize: 13 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  width={230}
+                  tick={{ fill: "#526b80", fontSize: 13 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  cursor={{ fill: "#12334d05" }}
+                  contentStyle={{
+                    background: "#ffffff",
+                    border: "1px solid #e0e6ee",
+                    borderRadius: 10,
+                  }}
+                />
+                <Bar
+                  dataKey="value"
+                  name="Обращения"
+                  fill="#153e5e"
+                  radius={[0, 4, 4, 0]}
+                  barSize={10}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       </section>
       {d.overdue_count > 0 && (
         <section className="panel recent-panel">

@@ -7,6 +7,7 @@ if [[ ! -x backend/.venv/bin/python || ! -d frontend/node_modules ]]; then
   read '?Нажмите Enter для выхода…'
   exit 1
 fi
+(cd backend && .venv/bin/alembic upgrade head)
 echo 'Модус: http://127.0.0.1:5173'
 echo 'Для остановки нажмите Ctrl+C или закройте терминал.'
 backend/.venv/bin/python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000 &

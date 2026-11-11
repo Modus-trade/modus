@@ -216,26 +216,31 @@ export default function TicketDetail({ user }: { user: User }) {
                                 status: "Статус",
                                 priority: "Приоритет",
                                 assignee_id: "Ответственный",
+                                resolution: "Результат рассмотрения",
                               }[h.field as "status"]
                             }
                             :{" "}
                             <span className="muted">
-                              {statuses[h.old_value || ""] ||
-                                priorities[h.old_value || ""] ||
-                                people.data?.find(
-                                  (u) => String(u.id) === h.old_value,
-                                )?.full_name ||
-                                h.old_value ||
-                                "Не назначен"}
+                              {h.field === "resolution"
+                                ? h.old_value || "Не указан"
+                                : statuses[h.old_value || ""] ||
+                                  priorities[h.old_value || ""] ||
+                                  people.data?.find(
+                                    (u) => String(u.id) === h.old_value,
+                                  )?.full_name ||
+                                  h.old_value ||
+                                  "Не назначен"}
                             </span>{" "}
                             →{" "}
-                            {statuses[h.new_value || ""] ||
-                              priorities[h.new_value || ""] ||
-                              people.data?.find(
-                                (u) => String(u.id) === h.new_value,
-                              )?.full_name ||
-                              h.new_value ||
-                              "Не назначен"}
+                            {h.field === "resolution"
+                              ? h.new_value || "Не указан"
+                              : statuses[h.new_value || ""] ||
+                                priorities[h.new_value || ""] ||
+                                people.data?.find(
+                                  (u) => String(u.id) === h.new_value,
+                                )?.full_name ||
+                                h.new_value ||
+                                "Не назначен"}
                           </p>
                           <small>{datetime(h.created_at)}</small>
                         </div>

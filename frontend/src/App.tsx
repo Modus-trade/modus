@@ -241,7 +241,7 @@ export default function App() {
               }
             >
               <Icon size={19} />
-              {label}
+              <span className="nav-label">{label}</span>
               {path === "/" && <span className="nav-live" />}
             </NavLink>
           ))}

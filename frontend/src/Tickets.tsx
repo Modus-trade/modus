@@ -65,7 +65,12 @@ export default function Tickets({
     enabled: user.role !== "EMPLOYEE",
   });
   function filter(k: string, v: string) {
-    setFilters((f) => ({ ...f, [k]: v }));
+    setFilters((f) => {
+      const next = { ...f };
+      if (v) next[k] = v;
+      else delete next[k];
+      return next;
+    });
     setPage(1);
   }
   const title = unassigned
@@ -401,7 +406,7 @@ export function NewTicket({
           </label>
           <label>
             Категория
-              <select {...register("category_id", { valueAsNumber: true })}>
+            <select {...register("category_id", { valueAsNumber: true })}>
               <option value="0">Выберите категорию</option>
               {cats.data
                 ?.filter((c) => c.is_active)
