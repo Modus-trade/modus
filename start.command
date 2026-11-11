@@ -2,7 +2,7 @@
 set -e
 unsetopt BG_NICE
 cd "${0:A:h}"
-if [[ ! -x backend/.venv/bin/python || ! -d frontend/node_modules ]]; then
+if [[ ! -x backend/.venv/bin/python || ! -d modus-front/node_modules ]]; then
   echo 'Сначала установите зависимости по инструкции в README.md.'
   read '?Нажмите Enter для выхода…'
   exit 1
@@ -20,4 +20,4 @@ backend/.venv/bin/python -m uvicorn app.main:app --app-dir backend --host 127.0.
 modus_backend_pid=$!
 trap 'kill "$modus_backend_pid" ${modus_tunnel_pid:-} 2>/dev/null || true' EXIT
 trap 'exit 0' INT TERM
-npm --prefix frontend run dev
+npm --prefix modus-front run dev
