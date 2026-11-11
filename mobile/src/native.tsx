@@ -1,5 +1,5 @@
-import { Host, Picker, Text } from '@expo/ui/swift-ui';
-import { pickerStyle, tag, tint } from '@expo/ui/swift-ui/modifiers';
+import { Button, HStack, Host, Image, Menu, Picker, Text } from '@expo/ui/swift-ui';
+import { foregroundStyle, frame, lineLimit, pickerStyle, tag, truncationMode } from '@expo/ui/swift-ui/modifiers';
 import { Haptics } from '@/settings';
 import type { StyleProp, ViewStyle } from 'react-native';
 
@@ -25,7 +25,7 @@ export function Segmented({ options, index, onChange, style }: { options: string
   );
 }
 
-/** Нативное выпадающее меню выбора (как <select>/option в iOS). */
+/** Нативное выпадающее меню выбора (как <select>/option в iOS). Длинное значение сокращается «…» в одну строку. */
 export function MenuPicker<T extends string | number>({
   value,
   options,
@@ -39,24 +39,29 @@ export function MenuPicker<T extends string | number>({
   onChange: (v: T) => void;
   color?: string;
 }) {
+  const current = options.find((o) => o.value === value)?.label ?? placeholder;
   return (
-    <Host matchContents>
-      <Picker
-        selection={(value ?? '__none') as T}
-        onSelectionChange={(v: T) => {
-          if (v === ('__none' as T)) return;
-          Haptics.selectionAsync();
-          onChange(v);
-        }}
-        modifiers={[pickerStyle('menu'), ...(color ? [tint(color)] : [])]}
+    <Host matchContents={{ vertical: true }} alignment="trailing" style={{ flex: 1, minWidth: 0 }}>
+      <Menu
+        label={
+          <HStack spacing={5} modifiers={[frame({ maxWidth: 10000, alignment: 'trailing' })]}>
+            <Text modifiers={[lineLimit(1), truncationMode('tail'), ...(color ? [foregroundStyle(color)] : [])]}>{current}</Text>
+            <Image systemName="chevron.up.chevron.down" size={13} color={color} />
+          </HStack>
+        }
       >
-        {value === null ? <Text modifiers={[tag('__none')]}>{placeholder}</Text> : null}
         {options.map((o) => (
-          <Text key={String(o.value)} modifiers={[tag(o.value)]}>
-            {o.label}
-          </Text>
+          <Button
+            key={String(o.value)}
+            label={o.label}
+            systemImage={o.value === value ? 'checkmark' : undefined}
+            onPress={() => {
+              Haptics.selectionAsync();
+              onChange(o.value);
+            }}
+          />
         ))}
-      </Picker>
+      </Menu>
     </Host>
   );
 }

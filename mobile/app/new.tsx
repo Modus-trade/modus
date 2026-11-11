@@ -103,8 +103,8 @@ export default function NewTicket() {
 
         <Card>
           <View style={f.row}>
-            <Text style={f.rowLabel}>Категория</Text>
-            <View style={{ flex: 1, alignItems: 'flex-end' }}>
+            <Text style={[f.rowLabel, { flexShrink: 0 }]}>Категория</Text>
+            <View style={{ flex: 1, minWidth: 0, flexDirection: 'row', marginLeft: 12 }}>
               <MenuPicker
                 value={categoryId}
                 placeholder="Выбрать"
