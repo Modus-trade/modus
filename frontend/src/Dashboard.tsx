@@ -90,10 +90,6 @@ export default function Dashboard({
     <div className="page-enter">
       <div className="page-heading">
         <div>
-          <div className="eyebrow">
-            <span className="live-dot" />
-            ПУЛЬС КОМПАНИИ
-          </div>
           <h1>
             Каждая идея <span>имеет значение.</span>
           </h1>
@@ -107,40 +103,42 @@ export default function Dashboard({
           Новое обращение
         </Button>
       </div>
-      <section className="hero-banner">
-        <div className="hero-text">
-          <span className="hero-tag">
-            <Sparkles size={14} />
-            ПРОСТРАНСТВО ДЛЯ ПЕРЕМЕН
-          </span>
-          <h2>
-            От обратной связи —<br />к реальным улучшениям.
-          </h2>
-          <p>Открытый диалог. Прозрачные решения. Общий результат.</p>
-          <button onClick={onNew}>
-            Предложить улучшение <ArrowUpRight size={18} />
-          </button>
-        </div>
-        <div className="hero-visual" aria-hidden="true">
-          <div className="grid-plane" />
-          <div className="hero-ring ring-one" />
-          <div className="hero-ring ring-two" />
-          <div className="hero-ring ring-three" />
-          <div className="hero-cube">
-            <Sparkles size={45} />
+      {user.role !== "ADMIN" && (
+        <section className="hero-banner">
+          <div className="hero-text">
+            <span className="hero-tag">
+              <Sparkles size={14} />
+              ПРОСТРАНСТВО ДЛЯ ПЕРЕМЕН
+            </span>
+            <h2>
+              От обратной связи —<br />к реальным улучшениям.
+            </h2>
+            <p>Открытый диалог. Прозрачные решения. Общий результат.</p>
+            <button onClick={onNew}>
+              Предложить улучшение <ArrowUpRight size={18} />
+            </button>
           </div>
-          <span className="visual-label vl1">
-            <span className="live-dot" />
-            Новая идея
-          </span>
-          <span className="visual-label vl2">
-            <CheckCheck size={15} />
-            Воплощаем вместе
-          </span>
-          <span className="visual-point p1" />
-          <span className="visual-point p2" />
-        </div>
-      </section>
+          <div className="hero-visual" aria-hidden="true">
+            <div className="grid-plane" />
+            <div className="hero-ring ring-one" />
+            <div className="hero-ring ring-two" />
+            <div className="hero-ring ring-three" />
+            <div className="hero-cube">
+              <Sparkles size={45} />
+            </div>
+            <span className="visual-label vl1">
+              <span className="live-dot" />
+              Новая идея
+            </span>
+            <span className="visual-label vl2">
+              <CheckCheck size={15} />
+              Воплощаем вместе
+            </span>
+            <span className="visual-point p1" />
+            <span className="visual-point p2" />
+          </div>
+        </section>
+      )}
       <section className="metrics">
         {metrics.map(({ label, value, unit, icon: Icon, note, color }) => (
           <div className={`metric ${color}`} key={label}>

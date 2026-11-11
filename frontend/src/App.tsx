@@ -26,7 +26,7 @@ import {
   Radar,
 } from "lucide-react";
 import { toast } from "sonner";
-import { api, roles, errorMessage, type User } from "./lib";
+import { api, errorMessage, type User } from "./lib";
 import { Disclosure, useRouteMotion } from "./components/motion";
 import { clearSession } from "./session";
 import { Button } from "./components/ui/button";
@@ -315,27 +315,14 @@ export default function App() {
       </aside>
       <div className="main-shell">
         <header className="topbar">
-          <div className="breadcrumb">
-            <button
-              className="icon-button mobile-toggle"
-              onClick={() => setMobile(true)}
-              aria-label="Открыть меню"
-            >
-              <Menu size={20} />
-            </button>
-            <span>Рабочее пространство</span>
-            <span>/</span>
-            <strong>
-              {nav.find((n) => n.path === location.pathname)?.label ||
-                "Обращение"}
-            </strong>
-          </div>
+          <button
+            className="icon-button mobile-toggle"
+            onClick={() => setMobile(true)}
+            aria-label="Открыть меню"
+          >
+            <Menu size={20} />
+          </button>
           <div className="topbar-right">
-            <span className="role-label">
-              <ShieldCheck size={13} />
-              {roles[user.role]}
-            </span>
-            <span className="divider" />
             <div className="person">
               <span className="avatar">
                 {user.full_name

@@ -397,6 +397,7 @@ label small {
   font-weight: 500;
 }
 .topbar-right {
+  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 18px;
@@ -450,7 +451,6 @@ label small {
   margin-left: -7px;
 }
 main {
-  padding: 34px 35px 20px;
   width: 100%;
   max-width: 1620px;
   margin: 0 auto;
@@ -470,9 +470,6 @@ main {
   color: #526b80;
   font-size: 15px;
   margin-top: 10px;
-}
-.page-heading > .button {
-  margin-top: 18px;
 }
 .hero-banner {
   position: relative;
@@ -1819,9 +1816,6 @@ a:focus-visible {
   .main-shell {
     margin-left: 250px;
   }
-  main {
-    padding: 42px;
-  }
   .page-heading h1 {
     font-size: 35px;
   }
@@ -1875,9 +1869,6 @@ a:focus-visible {
   }
   .main-shell {
     margin-left: 204px;
-  }
-  main {
-    padding: 28px 24px;
   }
   .topbar {
     padding-inline: 24px;
@@ -1978,7 +1969,6 @@ a:focus-visible {
   .page-heading > .button {
     font-size: 14px;
     padding: 9px;
-    margin-top: 24px;
   }
   .hero-text {
     padding: 24px;
@@ -2078,9 +2068,6 @@ a:focus-visible {
   .breadcrumb > span:nth-of-type(2) {
     display: none;
   }
-  main {
-    padding: 25px 16px;
-  }
   .page-heading {
     gap: 10px;
     margin-bottom: 22px;
@@ -2096,7 +2083,6 @@ a:focus-visible {
     font-size: 0;
     gap: 0;
     padding: 11px;
-    margin-top: 27px;
   }
   .page-heading > .button svg {
     width: 19px;
@@ -2525,9 +2511,6 @@ textarea:focus {
 }
 .divider {
   background: #e1e8ef;
-}
-main {
-  padding: 40px 38px 24px;
 }
 .eyebrow {
   color: #526b80;
@@ -3133,9 +3116,6 @@ tbody tr:hover {
   }
 }
 @media (min-width: 1600px) {
-  main {
-    padding: 44px;
-  }
   .page-heading h1 {
     font-size: 35px;
   }
@@ -3176,9 +3156,6 @@ tbody tr:hover {
   }
   .brand > div > span {
     font-size: 4.6px;
-  }
-  main {
-    padding: 30px 25px;
   }
   .page-heading h1 {
     font-size: 26px;
@@ -3251,9 +3228,6 @@ tbody tr:hover {
   .topbar {
     height: 66px;
     padding: 0 16px;
-  }
-  main {
-    padding: 26px 16px;
   }
   .page-heading h1 {
     font-size: 25px;
@@ -5164,3 +5138,39 @@ main {
 .recommendation-explanation summary { cursor: pointer; color: #426d8c; }
 .recommendation-explanation p { margin-top: 7px; }
 @media (prefers-reduced-motion: reduce) { .recommendation-person { transition: none; } .recommendation-person:hover { transform: none; } }
+/* Every route starts on the same content grid. */
+:root {
+  --page-padding-top: 32px;
+  --page-padding-inline: 38px;
+}
+main {
+  padding: var(--page-padding-top) var(--page-padding-inline) 24px;
+}
+.page-heading {
+  align-items: flex-start;
+}
+.page-heading > div {
+  min-width: 0;
+}
+.page-heading > .button {
+  margin-top: 0;
+}
+.page-heading .eyebrow {
+  margin-top: 0;
+}
+@media (min-width: 1600px) {
+  :root {
+    --page-padding-inline: 44px;
+  }
+}
+@media (max-width: 1200px) {
+  :root {
+    --page-padding-inline: 25px;
+  }
+}
+@media (max-width: 680px) {
+  :root {
+    --page-padding-top: 24px;
+    --page-padding-inline: 16px;
+  }
+}
