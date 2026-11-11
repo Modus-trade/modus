@@ -8,7 +8,7 @@
 
 <br>
 
-**[🌐 Открыть демо](https://modus-trade.makquiz.site)** &nbsp;·&nbsp; **[⚙️ Бэкенд](https://github.com/Modus-trade/modus-back)** &nbsp;·&nbsp; **[🎨 Сайт](https://github.com/Modus-trade/modus-front)** &nbsp;·&nbsp; **[📖 Документация](docs/product.md)**
+**[🌐 Открыть демо](https://modus-trade.makquiz.site)** &nbsp;·&nbsp; **[⚙️ Бэкенд](https://github.com/Modus-trade/modus-back)** &nbsp;·&nbsp; **[🎨 Сайт](https://github.com/Modus-trade/modus-front)** &nbsp;·&nbsp; **[📋 Соответствие ТЗ](docs/tz.md)** &nbsp;·&nbsp; **[📖 Документация](docs/product.md)**
 
 <sub>Сайт · iOS-приложение · живые уведомления · автодеплой</sub>
 
@@ -255,6 +255,7 @@ cd frontend && npm test && npm run build
 
 ## 📖 Документация
 
+- [docs/tz.md](docs/tz.md): **соответствие ТЗ и обращению директора** по пунктам; что реализовано, что имитируется, что в планах.
 - [docs/product.md](docs/product.md): центр внимания, роли и права, данные датасета, продуктовая гипотеза и пилот, этапы развития, ограничения MVP.
 - [docs/deploy.md](docs/deploy.md): как устроен сервер и автодеплой.
 - [backend/dataset.json](backend/dataset.json): 20 обращений из датасета заказчика. Сверка с исходным DOCX: `python backend/verify_dataset.py Датасет.docx`.

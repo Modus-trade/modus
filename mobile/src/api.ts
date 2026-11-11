@@ -109,6 +109,8 @@ export interface Summary {
   average_first_response_hours: number | null;
   overdue_count: number;
   overdue_tickets: Ticket[];
+  /** Общие проблемы, с которыми столкнулись несколько сотрудников. */
+  repeated?: (Ticket & { affected_count?: number })[];
 }
 
 export class ApiError extends Error {

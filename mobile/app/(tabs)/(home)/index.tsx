@@ -124,6 +124,15 @@ function ManagerHome({ summary, tickets }: { summary: Summary; tickets: Ticket[]
           <Empty icon="checkmark.circle" title="Всё разобрано" />
         </Card>
       )}
+      {summary.repeated?.length ? (
+        <>
+          <SectionTitle>Повторяющиеся проблемы</SectionTitle>
+          <TicketList
+            tickets={summary.repeated.map((t) => ({ ...t, title: `${t.title} · ${t.affected_count} чел.` }))}
+            index={3}
+          />
+        </>
+      ) : null}
       <SectionTitle>Статусы</SectionTitle>
       <StatusBar summary={summary} />
     </>
