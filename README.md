@@ -247,7 +247,7 @@ npx expo start              # QR-код для Expo Go на iPhone или `i` д
 ## ✅ Проверки
 
 ```sh
-cd backend && python -m pytest -q     # 21 интеграционный тест API
+cd backend && python -m pytest -q     # 22 интеграционных теста API
 cd frontend && npm test && npm run build
 ```
 
