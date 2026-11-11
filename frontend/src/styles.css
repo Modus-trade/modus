@@ -397,6 +397,7 @@ label small {
   font-weight: 500;
 }
 .topbar-right {
+  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 18px;
