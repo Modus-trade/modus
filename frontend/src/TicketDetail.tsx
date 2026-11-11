@@ -139,6 +139,7 @@ export default function TicketDetail({ user }: { user: User }) {
         </div>
         <Badge status={t.status} />
       </div>
+      <StageTracker status={t.status} />
       <div className="detail-grid">
         <div className="detail-main">
           <section className="panel padded">
@@ -467,5 +468,32 @@ export default function TicketDetail({ user }: { user: User }) {
         </aside>
       </div>
     </div>
+  );
+}
+
+const STAGES = [
+  { label: "Подано", statuses: ["NEW"] },
+  { label: "Рассмотрение", statuses: ["IN_REVIEW", "AWAITING_CLARIFICATION"] },
+  { label: "Реализация", statuses: ["IN_PROGRESS"] },
+  { label: "Решение", statuses: ["IMPLEMENTED", "REJECTED", "CLOSED"] },
+];
+
+/** Путь обращения: автор сразу видит, на какой стадии его вопрос. */
+function StageTracker({ status }: { status: string }) {
+  const current = STAGES.findIndex((s) => s.statuses.includes(status));
+  const last = current === STAGES.length - 1;
+  const outcome = status === "REJECTED" ? "Отклонено" : status === "IMPLEMENTED" ? "Реализовано" : status === "CLOSED" ? "Закрыто" : null;
+  return (
+    <ol className={`stage-tracker stage-${status}`} aria-label="Стадия обращения">
+      {STAGES.map((s, i) => (
+        <li key={s.label} className={i < current ? "done" : i === current ? "current" : ""} aria-current={i === current ? "step" : undefined}>
+          <span className="stage-dot" />
+          <span className="stage-label">
+            {last && i === current && outcome ? outcome : s.label}
+            {i === current && status === "AWAITING_CLARIFICATION" ? <small>нужен ответ автора</small> : null}
+          </span>
+        </li>
+      ))}
+    </ol>
   );
 }

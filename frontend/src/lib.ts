@@ -141,6 +141,7 @@ export interface Summary {
   by_status: Record<string, number>;
   by_category: Record<string, number>;
   overdue_tickets: Ticket[];
+  repeated: Ticket[];
 }
 
 export type AttentionReason = "unassigned" | "overdue" | "stale";

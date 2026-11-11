@@ -9,6 +9,7 @@ import {
   Clock3,
   AlarmClock,
   Sparkles,
+  Users,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -324,6 +325,35 @@ export default function Dashboard({
           </div>
         </div>
       </section>
+      {d.repeated?.length ? (
+        <section className="panel recent-panel">
+          <div className="panel-title">
+            <div>
+              <h3>
+                <Users size={17} className="orange-text" />
+                Повторяющиеся проблемы
+              </h3>
+              <p>С этими проблемами столкнулись несколько сотрудников — их стоит решить в первую очередь</p>
+            </div>
+          </div>
+          <ol className="repeated-list">
+            {d.repeated.map((t) => (
+              <li key={t.id}>
+                <Link to={`/tickets/${t.id}`}>
+                  <span className="repeated-count">{t.affected_count}</span>
+                  <span className="repeated-text">
+                    <strong>{t.title}</strong>
+                    <small>
+                      {t.number} · {t.category_name} · {statuses[t.status]}
+                    </small>
+                  </span>
+                  <ArrowRight size={16} />
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
       {d.overdue_count > 0 && (
         <section className="panel recent-panel">
           <div className="panel-title">
