@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   NavLink,
   Navigate,
@@ -33,19 +33,17 @@ import { Button } from "./components/ui/button";
 import { Loading } from "./components/common";
 import Dashboard from "./Dashboard";
 import Attention from "./Attention";
+import NotificationBell from "./components/NotificationBell";
+import { useRealtime, type NotificationList } from "./realtime";
 import Tickets, { NewTicket } from "./Tickets";
 import TicketDetail from "./TicketDetail";
 import Administration from "./Administration";
 
+/** Официальный логотип «Модус Трейд» (тот же SVG, что на modus-trade.kz и в мобильном приложении). */
 function Logo() {
   return (
     <div className="brand">
-      <span className="brand-mark" aria-hidden="true">
-        <i />
-      </span>
-      <div>
-        МОДУС ТРЕЙД<span>ПРОСТРАНСТВО УЛУЧШЕНИЙ</span>
-      </div>
+      <img className="brand-logo" src="/brand/modus-logo.svg" alt="Модус Трейд" width={132} height={42} />
     </div>
   );
 }
@@ -106,7 +104,7 @@ function Login() {
       <div className="login-form-wrap">
         <div className="login-form">
           <span className="eyebrow">РАДЫ ВАС ВИДЕТЬ</span>
-          <h2>Войти в пространство</h2>
+          <h2>Вход в систему</h2>
           <p className="muted">
             Ваши идеи. Понятный процесс. Видимый результат.
           </p>
@@ -193,6 +191,18 @@ export default function App() {
   const [loggingOut, setLoggingOut] = useState(false);
   const routeMotion = useRouteMotion();
   const fetching = useIsFetching();
+  useRealtime(me.data?.id);
+  // Открыли обращение — события по нему считаются прочитанными.
+  const openedTicket = location.pathname.match(/^\/tickets\/(\d+)$/)?.[1];
+  useEffect(() => {
+    if (!openedTicket || !me.data) return;
+    const list = qc.getQueryData<NotificationList>(["notifications"]);
+    if (list && !list.items.some((n) => !n.read && String(n.ticket_id) === openedTicket)) return;
+    api
+      .post(`/notifications/read-all?ticket_id=${openedTicket}`)
+      .then(() => qc.invalidateQueries({ queryKey: ["notifications"] }))
+      .catch(() => undefined);
+  }, [openedTicket, me.data, qc]);
   if (me.isPending)
     return (
       <div className="startup">
@@ -258,7 +268,7 @@ export default function App() {
         >
           <X />
         </button>
-        <div className="workspace-label">РАБОЧЕЕ ПРОСТРАНСТВО</div>
+        <div className="workspace-label">РАЗДЕЛЫ</div>
         <nav>
           {nav.map(({ path, label, icon: Icon }) => (
             <NavLink
@@ -323,6 +333,7 @@ export default function App() {
             <Menu size={20} />
           </button>
           <div className="topbar-right">
+            <NotificationBell />
             <div className="person">
               <span className="avatar">
                 {user.full_name

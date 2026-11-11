@@ -5174,3 +5174,216 @@ main {
     --page-padding-inline: 16px;
   }
 }
+
+/* Официальный логотип «Модус Трейд» */
+.brand-logo {
+  display: block;
+  height: 42px;
+  width: auto;
+}
+.sidebar .brand-logo {
+  height: 40px;
+}
+.startup .brand {
+  margin-bottom: 28px;
+  padding: 0;
+}
+.startup .brand-logo {
+  height: 52px;
+  animation: brand-in 0.5s ease-out both;
+}
+@keyframes brand-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .startup .brand-logo { animation: none; }
+}
+
+/* Колокольчик уведомлений */
+.bell {
+  position: relative;
+}
+.bell-button {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+.bell-badge {
+  position: absolute;
+  top: 3px;
+  right: 2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--mint);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  box-shadow: 0 0 0 2px #fff;
+  animation: bell-pop 0.35s ease-out;
+}
+@keyframes bell-pop {
+  from { transform: scale(0.4); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.bell-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: -8px;
+  width: min(400px, calc(100vw - 24px));
+  max-height: min(560px, calc(100vh - 100px));
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid #0b2d4812;
+  border-radius: 14px;
+  box-shadow: 0 18px 50px #0b2d481f, 0 2px 8px #0b2d480d;
+  z-index: 60;
+  overflow: hidden;
+  animation: bell-in 0.18s ease-out;
+  transform-origin: top right;
+}
+@keyframes bell-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+.bell-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid #0b2d480d;
+  color: #102f49;
+  font-size: 15px;
+}
+.bell-readall {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #526b80;
+  padding: 4px 8px;
+  border-radius: 7px;
+}
+.bell-readall:hover {
+  background: #0b2d4809;
+  color: var(--mint);
+}
+.bell-list {
+  overflow-y: auto;
+  padding: 6px;
+}
+.bell-item {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 10px;
+  border-radius: 10px;
+  text-align: left;
+  color: #102f49;
+}
+.bell-item:hover {
+  background: #0b2d4806;
+}
+.bell-item.unread {
+  background: #ed151c07;
+}
+.bell-item.unread:hover {
+  background: #ed151c0d;
+}
+.bell-icon {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef5fc;
+  color: #497caa;
+}
+.bell-icon.kind-clarification {
+  background: #fdf6ec;
+  color: #a6742f;
+}
+.bell-icon.kind-result {
+  background: #edf6f1;
+  color: #398060;
+}
+.bell-icon.kind-assigned {
+  background: #ed151c12;
+  color: var(--mint);
+}
+.bell-icon.kind-status {
+  background: #f0f0f8;
+  color: #746a9c;
+}
+.bell-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.bell-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.bell-body {
+  font-size: 13px;
+  color: #526b80;
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.bell-meta {
+  font-size: 12px;
+  color: #8a9bab;
+  margin-top: 2px;
+}
+.bell-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 4px;
+  background: var(--mint);
+}
+.bell-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 36px 24px;
+  color: #8a9bab;
+  text-align: center;
+}
+.bell-empty span {
+  color: #102f49;
+  font-weight: 600;
+  font-size: 14px;
+}
+.bell-empty small {
+  font-size: 12px;
+  line-height: 1.45;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bell-panel,
+  .bell-badge {
+    animation: none;
+  }
+}
+/* Шапка выше контента, чтобы панель уведомлений не пряталась под страницей. */
+.topbar {
+  position: relative;
+  z-index: 50;
+}

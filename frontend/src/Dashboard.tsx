@@ -58,7 +58,7 @@ export default function Dashboard({
       value: d.total,
       unit: "",
       icon: MessageSquare,
-      note: "В вашем пространстве",
+      note: "Доступные вам",
       color: "mint",
     },
     {
@@ -108,7 +108,7 @@ export default function Dashboard({
           <div className="hero-text">
             <span className="hero-tag">
               <Sparkles size={14} />
-              ПРОСТРАНСТВО ДЛЯ ПЕРЕМЕН
+              ОБРАТНАЯ СВЯЗЬ СОТРУДНИКОВ
             </span>
             <h2>
               От обратной связи —<br />к реальным улучшениям.

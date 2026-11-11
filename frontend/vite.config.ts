@@ -6,7 +6,11 @@ export default defineConfig(({ mode }) => ({
     port: 5173,
     strictPort: true,
     proxy: {
-      "/api": loadEnv(mode, ".", "").API_TARGET || "http://127.0.0.1:8000",
+      // ws: true — пробрасываем и WebSocket /api/ws (живые события).
+      "/api": {
+        target: loadEnv(mode, ".", "").API_TARGET || "http://127.0.0.1:8000",
+        ws: true,
+      },
     },
   },
   build: {
