@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import {
@@ -30,8 +30,10 @@ import { Button } from "./components/ui/button";
 import { Modal } from "./components/ui/dialog";
 import { Failure, Loading, TicketTable } from "./components/common";
 
-import { SimilarProblems, JoinedProblems } from "./components/SimilarProblems";
+import { JoinedProblems } from "./components/JoinedProblems";
 import { SmartHint } from "./components/SmartHint";
+import KnowledgeSuggestions from "./components/KnowledgeSuggestions";
+import type { KnowledgeContext } from "./knowledge";
 
 export default function Tickets({
   user,
@@ -342,9 +344,11 @@ type FormValues = z.infer<typeof ticketSchema>;
 export function NewTicket({
   open,
   onClose,
+  initialKnowledge,
 }: {
   open: boolean;
   onClose: () => void;
+  initialKnowledge?: KnowledgeContext;
 }) {
   const qc = useQueryClient();
   const navigate = useNavigate();
@@ -352,6 +356,8 @@ export function NewTicket({
   const [busy, setBusy] = useState(false);
   // Что сотрудник выбрал сам: это подсказка уже не перезаписывает.
   const [manual, setManual] = useState({ type: false, category: false });
+  const [attemptId, setAttemptId] = useState<string>(() => crypto.randomUUID());
+  const [viewedSolution, setViewedSolution] = useState(false);
   const cats = useQuery<Category[]>({
     queryKey: ["categories"],
     queryFn: async () => (await api.get("/categories")).data,
@@ -375,6 +381,18 @@ export function NewTicket({
       is_shared: false,
     },
   });
+  useEffect(() => {
+    if (open && initialKnowledge) {
+      reset({ type: "PROBLEM", category_id: initialKnowledge.categoryId,
+        title: `Вопрос по инструкции «${initialKnowledge.title}»`.slice(0, 250),
+        description: "",
+        proposed_solution: "", is_shared: false });
+      setAttemptId(initialKnowledge.attemptId);
+      setViewedSolution(true);
+      setManual({ type: true, category: true });
+      setFiles([]);
+    }
+  }, [open, initialKnowledge, reset]);
   async function submit(values: FormValues) {
     if (busy) return;
     setBusy(true);
@@ -382,6 +400,7 @@ export function NewTicket({
       const { data } = await api.post("/tickets", {
         ...values,
         is_shared: values.type === "PROBLEM" && values.is_shared,
+        ...(viewedSolution ? { self_service_attempt_id: attemptId } : {}),
       });
       let failed = 0;
       for (const file of files) {
@@ -402,6 +421,8 @@ export function NewTicket({
       reset();
       setFiles([]);
       setManual({ type: false, category: false });
+      setAttemptId(crypto.randomUUID());
+      setViewedSolution(false);
       onClose();
       navigate(`/tickets/${data.id}`);
     } catch (e) {
@@ -444,6 +465,13 @@ export function NewTicket({
             <small className="form-error">{errors.description.message}</small>
           )}
         </label>
+        {watch("type") !== "PRAISE" && <KnowledgeSuggestions
+          text={`${watch("title")} ${watch("description")}`}
+          categoryId={Number(watch("category_id"))}
+          enabled={open && !busy}
+          attemptId={attemptId}
+          onViewed={() => setViewedSolution(true)}
+        />}
         <SmartHint
           title={watch("title")}
           description={watch("description")}
@@ -504,18 +532,6 @@ export function NewTicket({
         )}
         {watch("type") === "PROBLEM" && (
           <>
-            <SimilarProblems
-              text={`${watch("title")} ${watch("description")}`}
-              categoryId={Number(watch("category_id"))}
-              enabled={open && !busy}
-              onBusyChange={setBusy}
-              onJoined={() => {
-                reset();
-                setFiles([]);
-                onClose();
-                navigate("/tickets");
-              }}
-            />
             <label className="shared-problem-toggle">
               <input type="checkbox" {...register("is_shared")} />
               <span>

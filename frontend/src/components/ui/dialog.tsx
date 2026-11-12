@@ -6,17 +6,21 @@ export function Modal({
   onClose,
   title,
   children,
+  className,
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
   children: ReactNode;
+  className?: string;
 }) {
   return (
     <DialogPrimitive.Root open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="modal-overlay" />
-        <DialogPrimitive.Content className="modal">
+        <DialogPrimitive.Content
+          className={className ? `modal ${className}` : "modal"}
+        >
           <div className="modal-head">
             <DialogPrimitive.Title>{title}</DialogPrimitive.Title>
             <DialogPrimitive.Close className="icon-button" aria-label="Закрыть">

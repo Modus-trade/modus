@@ -22,6 +22,10 @@
   margin-top: -6px;
   font-size: 13px;
 }
+.resolution-deadline .deadline-date-field {
+  margin-top: 0;
+  gap: 9px;
+}
 .resolution-deadline-actions {
   display: flex;
   flex-wrap: wrap;

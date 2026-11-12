@@ -1,0 +1,302 @@
+.date-time-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.date-time-trigger {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  min-width: 0;
+  min-height: 54px;
+  padding: 12px 14px;
+  border: 1px solid #dce6ee;
+  border-radius: 12px;
+  background: #f7f9fc;
+  color: #5a7387;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
+}
+.date-time-trigger:hover {
+  border-color: #9bb8ce;
+  background: #f1f6fb;
+}
+.date-time-trigger > svg {
+  flex-shrink: 0;
+}
+.date-time-trigger > span {
+  flex: 1;
+  min-width: 0;
+}
+.date-time-trigger strong,
+.date-time-trigger small {
+  display: block;
+  line-height: 1.5;
+}
+.date-time-trigger strong {
+  color: #193e5a;
+  font-size: 13px;
+  font-weight: 600;
+}
+.date-time-trigger small {
+  margin-top: 2px;
+  font-size: 12px;
+}
+.date-time-clear {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 32px;
+  color: #72899b;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+}
+.date-time-clear:hover {
+  background: #fceeee;
+  color: #b4232a;
+}
+.date-time-trigger:disabled,
+.date-time-clear:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.date-time-trigger:focus-visible,
+.date-time-clear:focus-visible,
+.date-time-calendar button:focus-visible,
+.date-time-shortcuts button:focus-visible,
+.date-time-time-shortcuts button:focus-visible {
+  outline: 2px solid #3978a5;
+  outline-offset: 3px;
+}
+.modal.date-time-dialog {
+  width: min(640px, calc(100% - 32px));
+  padding: 24px;
+  border-radius: 20px;
+}
+.date-time-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px;
+  gap: 22px;
+}
+.date-time-date-pane {
+  min-width: 0;
+}
+.date-time-time-pane {
+  padding: 18px 14px;
+  border: 1px solid #e3ebf2;
+  border-radius: 14px;
+  background: #f5f8fb;
+}
+.date-time-dialog .modal-head {
+  margin-bottom: 20px;
+}
+.date-time-dialog .modal-head h2 {
+  font-size: 19px;
+}
+.date-time-shortcuts,
+.date-time-time-shortcuts {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.date-time-shortcuts > button,
+.date-time-time-shortcuts > button {
+  padding: 8px 12px;
+  border: 1px solid #dfe8ef;
+  border-radius: 9px;
+  background: #fff;
+  color: #58748a;
+  font-size: 12px;
+  cursor: pointer;
+}
+.date-time-shortcuts > button:hover,
+.date-time-time-shortcuts > button:hover,
+.date-time-shortcuts > button[aria-pressed="true"],
+.date-time-time-shortcuts > button[aria-pressed="true"] {
+  background: #eef5fb;
+  border-color: #b9cede;
+  color: #1d4e70;
+}
+.date-time-calendar-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 20px 0 12px;
+}
+.date-time-calendar-head > button {
+  flex-shrink: 0;
+  padding: 7px;
+  min-height: 36px;
+}
+.date-time-month-selects {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+}
+.date-time-month-selects select {
+  min-width: 0;
+  padding: 8px;
+  border-color: transparent;
+  background-color: transparent;
+  color: #173d59;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.date-time-month-selects select:first-child {
+  flex: 1;
+}
+.date-time-month-selects select:last-child {
+  flex: 0 0 82px;
+  width: 82px;
+}
+.date-time-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+.date-time-weekday {
+  padding: 5px 0 9px;
+  color: #8599a9;
+  text-align: center;
+  font-size: 12px;
+}
+.date-time-calendar > button {
+  height: 40px;
+  min-width: 0;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  background: transparent;
+  color: #294e68;
+  font-size: 14px;
+  cursor: pointer;
+}
+.date-time-calendar > button:hover:not(:disabled) {
+  background: #edf4fa;
+}
+.date-time-calendar > button.is-other-month {
+  color: #94a8b6;
+}
+.date-time-calendar > button.is-today {
+  border-color: #c3d6e4;
+  font-weight: 600;
+}
+.date-time-calendar > button.is-selected,
+.date-time-calendar > button.is-selected:hover {
+  color: #fff;
+  background: #194b6d;
+  border-color: #194b6d;
+  box-shadow: 0 3px 8px #194b6d1a;
+}
+.date-time-calendar > button:disabled {
+  color: #c0cbd3;
+  cursor: default;
+}
+.date-time-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+.date-time-clock-label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: #3d5d75;
+  font-size: 14px;
+}
+.date-time-segments {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.date-time-segments > span {
+  padding-top: 9px;
+  color: #6b8498;
+  font-size: 22px;
+}
+.date-time-segments label {
+  width: 58px;
+  text-align: center;
+}
+.date-time-segments input {
+  width: 58px;
+  height: 46px;
+  padding: 6px;
+  border: 1px solid #d9e4ed;
+  border-radius: 10px;
+  background: #f7f9fc;
+  color: #173e5a;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.date-time-segments label > span {
+  display: block;
+  margin-top: 5px;
+  color: #8a9eae;
+  font-size: 10px;
+  font-weight: 400;
+}
+.date-time-time-shortcuts {
+  margin-top: 18px;
+  justify-content: center;
+}
+.date-time-summary {
+  display: grid;
+  gap: 5px;
+  padding-top: 16px;
+  margin-top: 20px;
+  border-top: 1px solid #dce6ee;
+  line-height: 1.6;
+}
+.date-time-summary strong {
+  font-size: 13px;
+  font-weight: 600;
+  color: #234f6e;
+}
+.date-time-summary small {
+  font-size: 11px;
+  color: #7890a2;
+}
+.date-time-summary > .form-error {
+  font-size: 12px;
+}
+.date-time-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #e5edf3;
+}
+@media (max-width: 600px) {
+  .modal.date-time-dialog {
+    width: min(420px, calc(100% - 24px));
+  }
+  .date-time-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+  .date-time-clock {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+@media (max-width: 420px) {
+  .modal.date-time-dialog {
+    padding: 20px;
+  }
+  .date-time-shortcuts > button {
+    padding: 7px 9px;
+  }
+}

@@ -24,9 +24,11 @@ import {
   CircleHelp,
   Unplug,
   Radar,
+  BookOpen,
+  type LucideIcon,
 } from "lucide-react";
 import { toast } from "sonner";
-import { api, errorMessage, type User } from "./lib";
+import { api, errorMessage, type AttentionSummary, type User } from "./lib";
 import { Disclosure, useRouteMotion } from "./components/motion";
 import { clearSession } from "./session";
 import { Button } from "./components/ui/button";
@@ -38,6 +40,8 @@ import { useRealtime, type NotificationList } from "./realtime";
 import Tickets, { NewTicket } from "./Tickets";
 import TicketDetail from "./TicketDetail";
 import Administration from "./Administration";
+import KnowledgeBase from "./KnowledgeBase";
+import type { KnowledgeContext } from "./knowledge";
 
 /** Официальный логотип «Модус Трейд» (тот же SVG, что на modus-trade.kz и в мобильном приложении). */
 function Logo() {
@@ -183,8 +187,16 @@ export default function App() {
     queryFn: async ({ signal }) => (await api.get("/auth/me", { signal })).data,
     retry: false,
   });
+  const attention = useQuery<Pick<AttentionSummary, "counts">>({
+    queryKey: ["navigation-attention"],
+    queryFn: async ({ signal }) =>
+      (await api.get("/analytics/attention", { params: { page_size: 1 }, signal })).data,
+    enabled: me.data?.role === "ADMIN",
+    refetchInterval: 30000,
+  });
   const [mobile, setMobile] = useState(false);
   const [newOpen, setNewOpen] = useState(false);
+  const [knowledgeContext, setKnowledgeContext] = useState<KnowledgeContext | undefined>();
   const [help, setHelp] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -214,10 +226,10 @@ export default function App() {
   const user = me.data;
   const manager = user.role !== "EMPLOYEE";
   const admin = user.role === "ADMIN";
-  const nav = [
+  const nav: { path: string; label: string; icon: LucideIcon; alert?: number }[] = [
     ...(admin
       ? [
-          { path: "/", label: "Требует внимания", icon: Radar },
+          { path: "/", label: "Требует внимания", icon: Radar, alert: attention.data?.counts.total },
           { path: "/overview", label: "Аналитика", icon: LayoutDashboard },
         ]
       : manager
@@ -228,11 +240,12 @@ export default function App() {
       label: admin ? "Все обращения" : manager ? "Инбокс" : "Мои обращения",
       icon: Inbox,
     },
+    { path: "/knowledge", label: "Инструкции и ответы", icon: BookOpen },
     ...(admin
       ? [
-          { path: "/unassigned", label: "Нераспределённые", icon: Unplug },
           { path: "/categories", label: "Категории", icon: Layers3 },
           { path: "/users", label: "Пользователи", icon: Users },
+          { path: "/unassigned", label: "Нераспределённые", icon: Unplug, alert: attention.data?.counts.unassigned },
         ]
       : []),
   ];
@@ -270,7 +283,7 @@ export default function App() {
         </button>
         <div className="workspace-label">РАЗДЕЛЫ</div>
         <nav>
-          {nav.map(({ path, label, icon: Icon }) => (
+          {nav.map(({ path, label, icon: Icon, alert }) => (
             <NavLink
               key={path}
               to={path}
@@ -282,7 +295,7 @@ export default function App() {
             >
               <Icon size={19} />
               <span className="nav-label">{label}</span>
-              {path === "/" && <span className="nav-live" />}
+              {!!alert && <span className="nav-live" role="img" aria-label={`Требуют внимания обращений ${alert}`} title={`Требуют внимания обращений ${alert}`} />}
             </NavLink>
           ))}
         </nav>
@@ -406,6 +419,7 @@ export default function App() {
               }
             />
             <Route path="/tickets/:id" element={<TicketDetail user={user} />} />
+            <Route path="/knowledge" element={<KnowledgeBase user={user} onNew={(context) => { setKnowledgeContext(context); setNewOpen(true); }} />} />
             <Route
               path="/categories"
               element={
@@ -429,15 +443,8 @@ export default function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
-        <footer className="page-footer">
-          <span>Модус · Сделаем работу лучше вместе</span>
-          <span>
-            <span className="live-dot" />
-            Система обратной связи
-          </span>
-        </footer>
       </div>
-      <NewTicket open={newOpen} onClose={() => setNewOpen(false)} />
+      <NewTicket open={newOpen} initialKnowledge={knowledgeContext} onClose={() => { setNewOpen(false); setKnowledgeContext(undefined); }} />
     </div>
   );
 }

@@ -306,6 +306,7 @@ label small {
 }
 .nav-live {
   margin-left: auto;
+  flex-shrink: 0;
   width: 5px;
   height: 5px;
   background: var(--mint);
@@ -1036,27 +1037,6 @@ td:last-child {
 .overdue-label {
   color: #526b80;
   font-size: 12px;
-}
-.page-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: #526b80;
-  font-size: 12px;
-  padding: 0 35px 23px;
-  max-width: 1620px;
-  width: 100%;
-  margin: 0 auto;
-}
-.page-footer > span:last-child {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-.page-footer .live-dot {
-  width: 4px;
-  height: 4px;
-  opacity: 0.65;
 }
 .heading-count {
   display: inline-block;
@@ -2155,13 +2135,6 @@ a:focus-visible {
   .legend > div {
     font-size: 13px;
   }
-  .page-footer {
-    padding: 8px 16px 20px;
-    font-size: 12px;
-  }
-  .page-footer > span:last-child {
-    display: none;
-  }
   .list-tabs {
     padding-inline: 16px;
     gap: 20px;
@@ -2463,8 +2436,7 @@ textarea:focus {
   background: var(--red);
   box-shadow: 0 0 0 4px #ed151c08;
 }
-.sidebar-company .live-dot,
-.page-footer .live-dot {
+.sidebar-company .live-dot {
   background: #2e8a70;
   box-shadow: none;
 }
@@ -2854,9 +2826,6 @@ tbody tr:hover {
   background: #f1f5fa;
   border-color: #e2eaf3;
   color: #365e7c;
-}
-.page-footer {
-  color: #526b80;
 }
 .pagination {
   border-color: #edf1f5;
@@ -5371,15 +5340,9 @@ main {
   z-index: 50;
 }
 /* Shared problems: discover once, solve together. */
-.similar-problems { border: 1px solid #cbdfea; background: linear-gradient(135deg, #f1f8fd, #f1faf6); border-radius: 18px; padding: 18px; }
 .similar-heading { display: flex; align-items: center; gap: 8px; color: #2b657b; }
 .similar-heading strong, .similar-heading h3 { font-size: 14px; }
-.similar-problems > p, .joined-problems > p { font-size: 12px; line-height: 1.7; color: #6a8395; margin: 9px 0 13px; }
-.similar-problems > small { display: block; font-size: 12px; color: #738b9c; margin-top: 12px; line-height: 1.6; }
-.similar-list { display: grid; gap: 10px; }
-.similar-item { background: #ffffffd9; border: 1px solid #dae7ee; border-radius: 12px; padding: 13px; }
-.similar-item h4 { margin: 6px 0 10px; font-size: 13px; line-height: 1.6; color: #234b63; }
-.similar-item-footer { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+.joined-problems > p { font-size: 12px; line-height: 1.7; color: #6a8395; margin: 9px 0 13px; }
 .affected-count { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 5px; color: #618096; font-size: 12px; margin-top: 7px; line-height: 1.6; }
 .affected-count.has-participants { color: #257b68; font-weight: 600; }
 .affected-count small { padding: 1px 5px; background: #e5f3ed; border-radius: 4px; font-size: 12px; color: #367c66; font-weight: 400; }
@@ -5593,15 +5556,6 @@ main {
 
 /* Похожие обращения и решение от ИИ */
 .insights h3 { display: flex; align-items: center; gap: 8px; }
-.insights-similar { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-.insights-similar li { border-bottom: 1px solid var(--line); padding-bottom: 10px; }
-.insights-similar li:last-child { border-bottom: 0; }
-.insights-similar a { display: flex; align-items: center; gap: 8px; color: inherit; text-decoration: none; font-size: 14px; }
-.insights-similar a:hover .insights-title { text-decoration: underline; }
-.insights-number { color: #526b80; font-size: 12px; flex: none; }
-.insights-title { flex: 1; min-width: 0; font-weight: 600; color: #102f49; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.insights-similar .badge { flex: none; font-size: 12px; }
-.insights-resolution { margin: 4px 0 0; font-size: 13px; color: #526b80; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .insights-solve {
   margin-top: 14px; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   padding: 10px 14px; border-radius: 10px; border: 1px solid #ed151c33; background: #ed151c0a; color: #b81218;

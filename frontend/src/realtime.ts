@@ -19,6 +19,7 @@ export type NotificationList = { items: AppNotification[]; total: number; unread
 
 type ServerEvent =
   | { type: "ticket_changed"; ticket_id: number; reason: string }
+  | { type: "knowledge_changed" | "access_changed" }
   | { type: "notification"; notification: AppNotification };
 
 /** Данные, которые зависят от обращений: перечитываем их при живом событии. */
@@ -54,7 +55,11 @@ export function useRealtime(userId: number | undefined) {
       ws = new WebSocket(`${protocol}//${location.host}/api/ws`);
       ws.onopen = () => {
         // После обрыва могли пропустить события — перечитываем всё.
-        if (attempt > 0) qc.invalidateQueries();
+        if (attempt > 0) {
+          window.dispatchEvent(new Event("knowledge-changed"));
+          void qc.resetQueries({ predicate: query => String(query.queryKey[0]).startsWith("knowledge") });
+          void qc.invalidateQueries({ queryKey: ["me"] });
+        }
         attempt = 0;
         ping = window.setInterval(() => ws?.readyState === 1 && ws.send("ping"), 25000);
       };
@@ -67,6 +72,15 @@ export function useRealtime(userId: number | undefined) {
           return;
         }
         if (event.type === "ticket_changed") refreshTickets(qc, event.ticket_id);
+        if (event.type === "knowledge_changed") {
+          window.dispatchEvent(new Event("knowledge-changed"));
+          void qc.resetQueries({ predicate: query => ["knowledge", "knowledge-reader", "knowledge-suggestions", "knowledge-manage"].includes(String(query.queryKey[0])) });
+        }
+        if (event.type === "access_changed") {
+          window.dispatchEvent(new Event("access-changed"));
+          window.dispatchEvent(new Event("knowledge-changed"));
+          void qc.resetQueries();
+        }
         if (event.type === "notification") {
           const n = event.notification;
           qc.setQueryData<NotificationList>(["notifications"], (old) =>

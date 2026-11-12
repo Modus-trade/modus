@@ -3,8 +3,14 @@ import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { CalendarClock } from "lucide-react";
 import { api, errorMessage, type Ticket, type User } from "../lib";
-import { deadlineDate, deadlineLocalInput, formatDeadline } from "../deadline";
+import {
+  deadlineDate,
+  deadlineLocalInput,
+  formatDeadline,
+  parseDeadlineInput,
+} from "../deadline";
 import { Button } from "./ui/button";
+import DateTimePicker from "./DateTimePicker";
 import "./ResolutionDeadline.css";
 
 export default function ResolutionDeadline({
@@ -60,6 +66,15 @@ export default function ResolutionDeadline({
   async function save(event: React.FormEvent) {
     event.preventDefault();
     if (busy) return;
+    const selected = value ? parseDeadlineInput(value) : null;
+    if (
+      value !== original.input &&
+      value &&
+      (!selected || selected.getTime() <= Date.now())
+    ) {
+      setError("Выберите корректную дату и время в будущем.");
+      return;
+    }
     if (needsReason && !reason.trim()) {
       setError("Укажите причину изменения срока.");
       return;
@@ -71,9 +86,7 @@ export default function ResolutionDeadline({
         resolution_due_at:
           value === original.input
             ? original.date
-            : value
-              ? new Date(value).toISOString()
-              : null,
+            : (selected?.toISOString() ?? null),
         expected_version: original.version,
         reason: reason.trim(),
       });
@@ -119,16 +132,18 @@ export default function ResolutionDeadline({
         active &&
         (editing ? (
           <form className="form-stack" onSubmit={save}>
-            <label>
-              Плановая дата и время
-              <input
-                type="datetime-local"
+            <div className="form-stack deadline-date-field">
+              <label htmlFor={`deadline-input-${ticket.id}`}>
+                Плановая дата и время
+              </label>
+              <DateTimePicker
+                id={`deadline-input-${ticket.id}`}
                 value={value}
-                onChange={(event) => setValue(event.target.value)}
+                onChange={setValue}
                 disabled={busy}
-                aria-describedby={`deadline-zone-${ticket.id}`}
+                describedBy={`deadline-zone-${ticket.id}`}
               />
-            </label>
+            </div>
             <small id={`deadline-zone-${ticket.id}`} className="muted">
               Время вашего устройства ·{" "}
               {Intl.DateTimeFormat().resolvedOptions().timeZone}

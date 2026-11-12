@@ -29,6 +29,7 @@ import {
 import { Button } from "./components/ui/button";
 import { Failure, Loading, TicketTable } from "./components/common";
 import TopicOverview from "./components/TopicOverview";
+import KnowledgeEffect from "./components/KnowledgeEffect";
 const colors = ["#ed151c", "#0b2d48", "#9bb1c5"];
 export default function Dashboard({
   user,
@@ -100,6 +101,23 @@ export default function Dashboard({
           Новое обращение
         </Button>
       </div>
+      {d.overdue_count > 0 && (
+        <section className="panel recent-panel">
+          <div className="panel-title">
+            <div>
+              <h3>
+                <AlarmClock size={17} className="orange-text" />
+                Требуют внимания
+              </h3>
+              <p>Обращения без первого ответа в установленный срок</p>
+            </div>
+            <span className="badge status-REJECTED">
+              {d.overdue_count} просрочено
+            </span>
+          </div>
+          <TicketTable tickets={d.overdue_tickets} />
+        </section>
+      )}
       {user.role !== "ADMIN" && (
         <section className="hero-banner">
           <div className="hero-text">
@@ -260,6 +278,7 @@ export default function Dashboard({
         )}
       </section>
       <TopicOverview categories={d.by_category} />
+      <KnowledgeEffect />
       {d.repeated?.length ? (
         <section className="panel recent-panel">
           <div className="panel-title">
@@ -289,23 +308,6 @@ export default function Dashboard({
           </ol>
         </section>
       ) : null}
-      {d.overdue_count > 0 && (
-        <section className="panel recent-panel">
-          <div className="panel-title">
-            <div>
-              <h3>
-                <AlarmClock size={17} className="orange-text" />
-                Требуют внимания
-              </h3>
-              <p>Обращения без первого ответа в установленный срок</p>
-            </div>
-            <span className="badge status-REJECTED">
-              {d.overdue_count} просрочено
-            </span>
-          </div>
-          <TicketTable tickets={d.overdue_tickets} />
-        </section>
-      )}
     </div>
   );
 }

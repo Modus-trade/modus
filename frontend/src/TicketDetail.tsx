@@ -33,6 +33,7 @@ import { AssigneeRecommendations } from "./components/AssigneeRecommendations";
 import ResolutionDeadline from "./components/ResolutionDeadline";
 import ResolutionReview from "./components/ResolutionReview";
 import { formatDeadline } from "./deadline";
+import KnowledgePublisher from "./components/KnowledgePublisher";
 
 export default function TicketDetail({ user }: { user: User }) {
   const { id } = useParams();
@@ -264,6 +265,7 @@ export default function TicketDetail({ user }: { user: User }) {
           ) : (
           <>
           <ResolutionReview ticket={t} user={user} />
+          <KnowledgePublisher ticket={t} user={user} />
           <section className="panel">
             <AnimatedTabs value={tab} label="Раздел обращения">
               <button
