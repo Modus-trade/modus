@@ -37,7 +37,7 @@ export default function Profile() {
       { value: items.filter((t) => t.status === 'IMPLEMENTED' || t.status === 'CLOSED').length, label: 'Решено' },
       { value: items.filter((t) => t.status === 'AWAITING_CLARIFICATION').length, label: 'Ждут ответа', accent: true },
     ];
-  }, [manager, user.id]);
+  }, [manager, user.id], 'profile');
 
   return (
     <ScrollView style={styles.screen} contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.content}>

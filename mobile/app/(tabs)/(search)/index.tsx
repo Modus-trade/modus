@@ -10,7 +10,7 @@ export default function Search() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Ticket[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const recent = useData(() => api.tickets({ sort: 'updated_at' }).then((r) => r.items.slice(0, 8)));
+  const recent = useData(() => api.tickets({ sort: 'updated_at' }).then((r) => r.items.slice(0, 8)), [], 'recent');
 
   useEffect(() => {
     const timer = setTimeout(() => setQuery(text.trim()), 250);

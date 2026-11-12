@@ -24,7 +24,7 @@ export default function Home() {
   const { data, error, refreshing, refresh, reload } = useData(async () => {
     const [tickets, summary] = await Promise.all([api.tickets({ sort: 'updated_at' }), manager ? api.summary() : null]);
     return { tickets: tickets.items, summary };
-  }, [manager]);
+  }, [manager], 'home');
 
   const raw = new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
   const today = raw.charAt(0).toUpperCase() + raw.slice(1);

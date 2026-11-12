@@ -32,7 +32,7 @@ export default function TicketScreen() {
   const insets = useSafeAreaInsets();
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   const [assignees, setAssignees] = useState<User[]>([]);
-  const { data: t, error, refreshing, refresh, reload, setData } = useData(() => api.ticket(id), [id]);
+  const { data: t, error, refreshing, refresh, reload, setData } = useData(() => api.ticket(id), [id], `ticket.${id}`);
 
   useEffect(() => {
     api.assignees().then(setAssignees).catch(() => undefined);

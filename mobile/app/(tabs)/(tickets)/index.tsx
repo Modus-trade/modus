@@ -39,6 +39,7 @@ export default function Tickets() {
   const { data, error, refreshing, refresh, reload } = useData(
     () => api.tickets({ type: type ?? undefined, sort, order: sort === 'due_at' ? 'asc' : 'desc', overdue: overdueOnly || undefined }),
     [type, sort, overdueOnly],
+    `tickets.${type ?? 'all'}.${sort}.${overdueOnly}`,
   );
 
   const items = useMemo(() => {
