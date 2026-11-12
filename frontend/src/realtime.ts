@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { clearSession } from "./session";
 
 export type AppNotification = {
   id: number;
@@ -84,10 +85,21 @@ export function useRealtime(userId: number | undefined) {
           });
         }
       };
-      ws.onclose = () => {
+      ws.onclose = async () => {
         window.clearInterval(ping);
         if (stopped) return;
         attempt += 1;
+        // Сервер не пускает уже несколько раз подряд — возможно, сессия истекла.
+        // Тогда не стучимся бесконечно, а выходим на страницу входа.
+        if (attempt >= 2) {
+          const me = await fetch("/api/auth/me", { credentials: "include" }).catch(() => null);
+          if (stopped) return;
+          if (me?.status === 401) {
+            stopped = true;
+            await clearSession(qc);
+            return;
+          }
+        }
         retry = window.setTimeout(connect, Math.min(15000, 1000 * 2 ** Math.min(attempt, 4)));
       };
     };
