@@ -5620,3 +5620,5 @@ main {
 }
 .insights-actions button:hover { background: #f5f7fa; }
 .insights-note { margin: 8px 0 0; font-size: 13px; }
+.smart-hint.is-idle { background: #f5f7fa; border-style: dashed; }
+.smart-hint.is-idle .smart-hint-body span { color: #526b80; }
