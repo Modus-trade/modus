@@ -159,10 +159,9 @@ export default function TicketDetail({ user }: { user: User }) {
         <div className="detail-main">
           <section className="panel padded">
             <h3>Описание обращения</h3>
-            {t.type === "PROBLEM" && (
+            {t.type === "PROBLEM" && (t.affected_count ?? 1) > 1 && (
               <p className="affected-count has-participants">
-                Столкнулись: {t.affected_count || 1} ·{" "}
-                {t.is_shared ? "Общая проблема" : "Закрытое обращение"}
+                Общая проблема · столкнулись {t.affected_count} {[2,3,4].includes((t.affected_count ?? 0) % 10) && ![12,13,14].includes((t.affected_count ?? 0) % 100) ? "сотрудника" : "сотрудников"}
               </p>
             )}
             <p className="ticket-description">{t.description}</p>
