@@ -141,6 +141,7 @@ export function TicketTable({
                     <div className="ticket-subject-copy">
                       <span className="ticket-meta">
                         <span className="ticket-number">{t.number}</span>
+                        {t.source === "BITRIX24" && <span className="bitrix-source">Битрикс24</span>}
                         <span>·</span>
                         {types[t.type]}
                         {urgent && !attention && (

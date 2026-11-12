@@ -128,7 +128,7 @@ export default function ResolutionDeadline({
       {overdue && (
         <span className="badge status-REJECTED">Решение просрочено</span>
       )}
-      {user.role !== "EMPLOYEE" &&
+      {(user.role !== "EMPLOYEE" || ticket.assignee_id === user.id) &&
         active &&
         (editing ? (
           <form className="form-stack" onSubmit={save}>

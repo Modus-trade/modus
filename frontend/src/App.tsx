@@ -40,6 +40,7 @@ import { useRealtime, type NotificationList } from "./realtime";
 import Tickets, { NewTicket } from "./Tickets";
 import TicketDetail from "./TicketDetail";
 import Administration from "./Administration";
+import Integrations from "./Integrations";
 import KnowledgeBase from "./KnowledgeBase";
 import type { KnowledgeContext } from "./knowledge";
 
@@ -245,6 +246,7 @@ export default function App() {
       ? [
           { path: "/categories", label: "Категории", icon: Layers3 },
           { path: "/users", label: "Пользователи", icon: Users },
+          { path: "/integrations", label: "Интеграции", icon: Unplug },
           { path: "/unassigned", label: "Нераспределённые", icon: Unplug, alert: attention.data?.counts.unassigned },
         ]
       : []),
@@ -440,6 +442,7 @@ export default function App() {
                 )
               }
             />
+            <Route path="/integrations" element={admin ? <Integrations /> : <Navigate to="/tickets" replace />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>

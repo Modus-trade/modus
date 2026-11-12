@@ -32,6 +32,7 @@ import { Button } from "./components/ui/button";
 import { AssigneeRecommendations } from "./components/AssigneeRecommendations";
 import ResolutionDeadline from "./components/ResolutionDeadline";
 import ResolutionReview from "./components/ResolutionReview";
+import BitrixTask from "./components/BitrixTask";
 import { formatDeadline } from "./deadline";
 import KnowledgePublisher from "./components/KnowledgePublisher";
 
@@ -75,7 +76,7 @@ export default function TicketDetail({ user }: { user: User }) {
   }, [t]);
   if (query.isPending) return <Loading />;
   if (!t) return <Failure retry={() => query.refetch()} />;
-  const manager = user.role !== "EMPLOYEE";
+  const manager = user.role !== "EMPLOYEE" || t.assignee_id === user.id;
   const final = ["CLOSED", "IMPLEMENTED", "REJECTED"].includes(t.status);
   const participant = t.viewer === "participant";
   function historyValue(field: string, value: string | null) {
@@ -167,6 +168,7 @@ export default function TicketDetail({ user }: { user: User }) {
             {types[t.type]}
             <span>·</span>
             {t.category_name}
+            {t.source === "BITRIX24" && <span className="bitrix-source">Источник: Битрикс24</span>}
           </div>
           <h1>{t.title}</h1>
         </div>
@@ -415,6 +417,7 @@ export default function TicketDetail({ user }: { user: User }) {
           )}
         </div>
         <aside className="detail-side">
+          {!participant && <BitrixTask ticket={t} user={user} />}
           <section className="panel padded">
             <h3>Детали обращения</h3>
             <dl>
@@ -447,7 +450,7 @@ export default function TicketDetail({ user }: { user: User }) {
               )}
             </dl>
           </section>
-          {manager && (
+          {user.role !== "EMPLOYEE" && (
             <TicketInsights
               ticketId={t.id}
               final={["IMPLEMENTED", "REJECTED", "CLOSED"].includes(t.status)}

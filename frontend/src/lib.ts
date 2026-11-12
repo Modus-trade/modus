@@ -83,6 +83,7 @@ export interface Category {
   sort_order: number;
 }
 export interface Ticket {
+  source?: "WEB" | "BITRIX24";
   is_shared: boolean;
   /** participant — присоединился к общей проблеме: только просмотр */
   viewer?: "member" | "participant";
