@@ -25,6 +25,7 @@ import { Card, enter, ErrorBanner, layout, Loading, StageTracker, StatusDot, sty
 import { colors, finalStatuses, formatDate, priorityMeta, relative, shadow, statusMeta, transitions, typeMeta } from '@/theme';
 import { useData } from '@/useData';
 import { TicketInsights } from '@/insights';
+import { RecordingBar, useVoiceMessage, VoiceBubble } from '@/voiceMessage';
 
 export default function TicketScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -89,7 +90,8 @@ export default function TicketScreen() {
     );
   }
 
-  const open = !!t && !finalStatuses.includes(t.status);
+  const participant = t?.viewer === 'participant';
+  const open = !!t && !participant && !finalStatuses.includes(t.status);
   const canManage = manager && !!t && t.status !== 'CLOSED';
 
   return (
@@ -144,7 +146,15 @@ export default function TicketScreen() {
           {error ? <ErrorBanner message={error} onRetry={() => reload()} /> : null}
           {!t && !error ? <Loading /> : null}
           {t ? <Body t={t} user={user} assignees={assignees} /> : null}
-          {t && manager ? (
+          {t && participant ? (
+            <Card style={{ padding: 16, flexDirection: 'row', gap: 10 }}>
+              <SymbolView name="person.2.fill" size={18} tintColor={colors.secondary} />
+              <Text style={{ flex: 1, fontSize: 14, lineHeight: 20, color: colors.secondary }}>
+                Вы присоединились к этой общей проблеме. Здесь видно стадию и итоговый результат — уведомления о них придут автоматически. Переписка доступна автору и ответственному.
+              </Text>
+            </Card>
+          ) : null}
+          {t && manager && !participant ? (
             <TicketInsights
               ticketId={t.id}
               final={finalStatuses.includes(t.status)}
@@ -162,6 +172,12 @@ export default function TicketScreen() {
             onAttach={(files) =>
               mutate(async () => {
                 for (const f of files) await api.upload(t.id, f);
+              })
+            }
+            onVoice={(uri, seconds, clarify) =>
+              mutate(async () => {
+                await api.voiceComment(t.id, uri, seconds, clarify);
+                setTimeout(() => scroll.current?.scrollToEnd({ animated: true }), 300);
               })
             }
             onSend={(body, clarify) =>
@@ -229,7 +245,7 @@ function Body({ t, user, assignees }: { t: TicketDetail; user: User; assignees: 
       ) : null}
 
       <Animated.View entering={enter(3)} style={b.block}>
-        <Text style={b.text}>{t.description}</Text>
+        <Text style={b.text}>{t.viewer === 'participant' ? 'Описание видят автор и ответственный — здесь вы следите за стадией и результатом.' : t.description}</Text>
         {t.proposed_solution ? (
           <>
             <Text style={b.label}>Предлагаемое решение</Text>
@@ -242,7 +258,7 @@ function Body({ t, user, assignees }: { t: TicketDetail; user: User; assignees: 
       {details ? (
         <Animated.View entering={FadeIn.duration(300)} exiting={FadeOut.duration(150)} layout={layout} style={b.details}>
           <Detail label="Категория" value={t.category_name} />
-          <Detail label="Автор" value={`${t.author_name}, ${t.department}`} />
+          {t.viewer !== 'participant' ? <Detail label="Автор" value={`${t.author_name}, ${t.department}`} /> : null}
           <Detail label="Подано" value={formatDate(t.created_at, true)} />
           <Detail label="Первый ответ" value={t.first_response_at ? formatDate(t.first_response_at, true) : `ожидается до ${formatDate(t.due_at, true)}`} />
           <Detail label="Приоритет" value={priorityMeta[t.priority].label} />
@@ -374,7 +390,11 @@ function Bubble({ c, mine, index }: { c: Comment; mine: boolean; index: number }
         ]}
       >
         {c.is_clarification_request ? <Text style={[b.clarify, mine && { color: '#FFD9A8' }]}>Уточняющий вопрос</Text> : null}
-        <Text style={[b.bubbleText, mine && { color: '#fff' }]}>{c.body}</Text>
+        {c.audio_id ? (
+          <VoiceBubble audioId={c.audio_id} seconds={c.audio_seconds ?? null} transcript={c.transcript} mine={mine} />
+        ) : (
+          <Text style={[b.bubbleText, mine && { color: '#fff' }]}>{c.body}</Text>
+        )}
       </View>
       <Text style={b.bubbleMeta}>
         {mine ? 'Вы' : c.author_name.split(' ')[0]} · {formatDate(c.created_at, true)}
@@ -431,6 +451,7 @@ function Composer({
   bottom,
   onSend,
   onAttach,
+  onVoice,
   draft,
 }: {
   ticket: TicketDetail;
@@ -439,6 +460,7 @@ function Composer({
   draft?: { text: string; at: number } | null;
   onSend: (body: string, clarify: boolean) => Promise<boolean>;
   onAttach: (files: PickedFile[]) => Promise<boolean>;
+  onVoice: (uri: string, seconds: number, clarify: boolean) => Promise<boolean>;
 }) {
   // Строка ввода едет вверх вместе с клавиатурой.
   const keyboard = useAnimatedKeyboard();
@@ -467,6 +489,14 @@ function Composer({
     }
   }
 
+  const voice = useVoiceMessage(async (uri, seconds) => {
+    setSending(true);
+    const ok = await onVoice(uri, seconds, clarify);
+    setSending(false);
+    if (ok) setClarify(false);
+  });
+  const empty = !text.trim();
+
   const placeholder = clarify
     ? 'Что нужно уточнить у автора?'
     : ticket.status === 'AWAITING_CLARIFICATION' && !manager
@@ -491,13 +521,33 @@ function Composer({
         </Pressable>
       ) : null}
       <Container {...(glass ? { glassEffectStyle: 'regular' as const } : {})} style={[b.inputGlass, !glass && b.fallback]}>
-        <View style={b.attach}>
-          <AttachMenu compact onPick={(files) => onAttach(files)} />
-        </View>
-        <TextInput style={b.input} placeholder={placeholder} placeholderTextColor={colors.secondary} value={text} onChangeText={setText} multiline />
-        <Pressable onPress={send} disabled={!text.trim() || sending} style={[b.send, { backgroundColor: text.trim() ? colors.accent : (colors.fill as string) }]}>
-          {sending ? <ActivityIndicator color="#fff" size="small" /> : <SymbolView name="arrow.up" size={16} weight="bold" tintColor="#fff" />}
-        </Pressable>
+        {voice.recording ? (
+          <RecordingBar seconds={voice.seconds} levels={voice.levels} onCancel={voice.cancel} />
+        ) : (
+          <>
+            <View style={b.attach}>
+              <AttachMenu compact onPick={(files) => onAttach(files)} />
+            </View>
+            <TextInput style={b.input} placeholder={placeholder} placeholderTextColor={colors.secondary} value={text} onChangeText={setText} multiline />
+          </>
+        )}
+        {sending ? (
+          <View style={[b.send, { backgroundColor: colors.accent }]}>
+            <ActivityIndicator color="#fff" size="small" />
+          </View>
+        ) : voice.recording ? (
+          <Pressable onPress={voice.finish} style={[b.send, { backgroundColor: colors.accent }]} accessibilityLabel="Отправить голосовое">
+            <SymbolView name="arrow.up" size={16} weight="bold" tintColor="#fff" />
+          </Pressable>
+        ) : empty ? (
+          <Pressable onPress={voice.start} style={[b.send, { backgroundColor: 'transparent' }]} accessibilityLabel="Записать голосовое">
+            <SymbolView name="mic.fill" size={19} tintColor={colors.label as string} />
+          </Pressable>
+        ) : (
+          <Pressable onPress={send} style={[b.send, { backgroundColor: colors.accent }]} accessibilityLabel="Отправить">
+            <SymbolView name="arrow.up" size={16} weight="bold" tintColor="#fff" />
+          </Pressable>
+        )}
       </Container>
     </Animated.View>
   );

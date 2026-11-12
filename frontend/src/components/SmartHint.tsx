@@ -59,8 +59,12 @@ export function SmartHint({
   const imageKey = files.map((f) => f.name + f.size).join("|");
 
   useEffect(() => {
-    if (!enabled || title.trim().length + description.trim().length < 20) return;
     const id = ++seq.current;
+    if (!enabled || title.trim().length + description.trim().length < 20) {
+      setHint(null);
+      setLoading(false);
+      return;
+    }
     const timer = setTimeout(async () => {
       setLoading(true);
       try {
@@ -86,7 +90,15 @@ export function SmartHint({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title, description, imageKey, enabled]);
 
-  if (!hint && !loading) return null;
+  if (!hint && !loading)
+    return (
+      <div className="smart-hint is-idle">
+        <Sparkles size={17} className="smart-hint-icon" />
+        <div className="smart-hint-body">
+          <span>Напишите заголовок и описание — ИИ сам подберёт тип и категорию и покажет, кто ответит.</span>
+        </div>
+      </div>
+    );
   const differs =
     hint &&
     ((hint.category_id && hint.category_id !== current.category_id) || hint.type !== current.type);
@@ -105,6 +117,7 @@ export function SmartHint({
             {hint.sla_hours ? `, ответ до ${hint.sla_hours} ч` : ""}
           </span>
           {hint.reason ? <small>«{hint.reason}»</small> : null}
+          {!hint.category_id ? <small>Категорию не удалось определить — выберите ниже</small> : null}
           <small className="smart-hint-source">
             {hint.source === "ai" ? "Подобрано ИИ" : "Подобрано автоматически по словам"} · можно поменять ниже
           </small>

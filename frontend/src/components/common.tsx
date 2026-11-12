@@ -151,12 +151,10 @@ export function TicketTable({
                         {t.title}
                       </Link>
                       <span className="ticket-category">{t.category_name}</span>
-                      {t.type === "PROBLEM" && (
-                        <span
-                          className={`affected-count ${t.affected_count > 1 ? "has-participants" : ""}`}
-                        >
+                      {t.type === "PROBLEM" && t.affected_count > 1 && (
+                        <span className="affected-count has-participants">
                           <Users size={13} />
-                          Столкнулись: {t.affected_count || 1}
+                          Столкнулись: {t.affected_count}
                           {t.is_shared && <small>Общая проблема</small>}
                         </span>
                       )}

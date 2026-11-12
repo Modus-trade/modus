@@ -8,11 +8,14 @@ import {
   Alert,
   Pressable,
   ScrollView,
+  Switch,
   StyleSheet,
   View,
 } from 'react-native';
 import { PressableScale, Text, TextInput } from '@/ui';
-import { api, firstImageBase64, type Category, type Suggestion, type TicketType, type User } from '@/api';
+import { api, firstImageBase64, type Category, type Suggestion, type TicketType, type User, type VoiceResult } from '@/api';
+import { VoiceInput } from '@/voice';
+import { SharedProblems } from '@/shared';
 import { Card, layout, styles } from '@/components';
 import { MenuPicker, Segmented } from '@/native';
 import Animated, { FadeIn, FadeInDown, FadeOut, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
@@ -32,11 +35,16 @@ export default function NewTicket() {
   const [solution, setSolution] = useState('');
   const [files, setFiles] = useState<PickedFile[]>([]);
   const [busy, setBusy] = useState(false);
+  const [shared, setShared] = useState(false);
   // Подсказка типа и категории. То, что сотрудник выбрал сам, она не перезаписывает.
   const [hint, setHint] = useState<Suggestion | null>(null);
   const [hinting, setHinting] = useState(false);
   const manual = useRef({ type: false, category: false });
   const hintSeq = useRef(0);
+  // Голосовой ввод: что было до него (чтобы вернуть) и текст, по которому подсказка уже есть.
+  const [voice, setVoice] = useState<{ result: VoiceResult; before: { title: string; description: string; type: TicketType; categoryId: number | null } } | null>(null);
+  const [showTranscript, setShowTranscript] = useState(false);
+  const hintedText = useRef('');
 
   useEffect(() => {
     api.categories().then(setCategories).catch((e) => Alert.alert('Ошибка', e.message));
@@ -45,8 +53,15 @@ export default function NewTicket() {
 
   const imageKey = files.map((f) => f.uri).join('|');
   useEffect(() => {
-    if (title.trim().length + description.trim().length < 20) return;
+    if (hintedText.current === title + '\n' + description) return;
     const id = ++hintSeq.current;
+    if (title.trim().length + description.trim().length < 20) {
+      // Текст стёрли — убираем устаревшую подсказку и то, что она подставила.
+      setHint(null);
+      setHinting(false);
+      if (!manual.current.category) setCategoryId(null);
+      return;
+    }
     const timer = setTimeout(async () => {
       setHinting(true);
       try {
@@ -54,7 +69,7 @@ export default function NewTicket() {
         if (id !== hintSeq.current) return;
         setHint(s);
         if (!manual.current.type) setType(s.type);
-        if (!manual.current.category && s.category_id) setCategoryId(s.category_id);
+        if (!manual.current.category) setCategoryId(s.category_id);
       } catch {
         // Подсказка необязательна.
       } finally {
@@ -64,6 +79,32 @@ export default function NewTicket() {
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title, description, imageKey]);
+
+  function applyVoice(r: VoiceResult) {
+    setVoice({ result: r, before: { title, description, type, categoryId } });
+    setShowTranscript(false);
+    hintSeq.current++;
+    hintedText.current = r.title + '\n' + r.description;
+    setTitle(r.title);
+    setDescription(r.description);
+    setHint(r.suggestion);
+    setHinting(false);
+    if (!manual.current.type) setType(r.suggestion.type);
+    if (!manual.current.category && r.suggestion.category_id) setCategoryId(r.suggestion.category_id);
+  }
+
+  function undoVoice() {
+    if (!voice) return;
+    Haptics.selectionAsync();
+    const b = voice.before;
+    hintedText.current = '';
+    setTitle(b.title);
+    setDescription(b.description);
+    setType(b.type);
+    setCategoryId(b.categoryId);
+    setHint(null);
+    setVoice(null);
+  }
 
   function applyHint() {
     if (!hint) return;
@@ -98,6 +139,7 @@ export default function NewTicket() {
         title: title.trim(),
         description: description.trim(),
         proposed_solution: solution.trim() || null,
+        is_shared: type === 'PROBLEM' && shared,
       });
       const failed: string[] = [];
       for (const f of files) await api.upload(ticket.id, f).catch(() => failed.push(f.name));
@@ -133,7 +175,31 @@ export default function NewTicket() {
         keyboardDismissMode="interactive"
         automaticallyAdjustKeyboardInsets
       >
-        <Card>
+        <VoiceInput onResult={applyVoice} compact={!!voice || title.length > 0} />
+
+        {voice ? (
+          <Animated.View entering={FadeInDown.duration(300)} style={f.voice}>
+            <View style={f.voiceHead}>
+              <SymbolView name="waveform" size={15} tintColor={colors.accent} />
+              <Text style={f.voiceText}>Заполнено по голосу — проверьте и поправьте, если нужно</Text>
+            </View>
+            <View style={f.voiceActions}>
+              <PressableScale onPress={() => setShowTranscript((v) => !v)} style={f.voiceBtn}>
+                <Text style={f.voiceBtnText}>{showTranscript ? 'Скрыть запись' : 'Что я сказал'}</Text>
+              </PressableScale>
+              <PressableScale onPress={undoVoice} style={f.voiceBtn}>
+                <Text style={f.voiceBtnText}>Вернуть как было</Text>
+              </PressableScale>
+            </View>
+            {showTranscript ? (
+              <Animated.View entering={FadeIn.duration(200)}>
+                <Text style={f.transcript}>«{voice.result.transcript}»</Text>
+              </Animated.View>
+            ) : null}
+          </Animated.View>
+        ) : null}
+
+        <Card style={voice ? f.filled : undefined}>
           <TextInput style={f.title} placeholder="Тема" placeholderTextColor={colors.tertiary} value={title} onChangeText={setTitle} maxLength={250} />
           <View style={f.sep} />
           <TextInput
@@ -157,6 +223,7 @@ export default function NewTicket() {
                     {(hint.type === 'PRAISE' ? 'Отзыв' : typeMeta[hint.type].label) + (hint.category ? ` · ${hint.category}` : '')}
                   </Text>
                   {hint.reason ? <Text style={f.hintText}>«{hint.reason}»</Text> : null}
+                  {!hint.category_id ? <Text style={f.hintText}>Категорию не удалось определить — выберите ниже</Text> : null}
                   <Text style={f.hintSource}>{hint.source === 'ai' ? 'Подобрано ИИ' : 'Подобрано автоматически'} · можно поменять</Text>
                 </>
               ) : (
@@ -169,6 +236,18 @@ export default function NewTicket() {
               </PressableScale>
             ) : null}
           </Animated.View>
+        ) : null}
+
+        {type === 'PROBLEM' ? (
+          <SharedProblems
+            text={`${title} ${description}`}
+            categoryId={categoryId}
+            onJoined={(p) => {
+              router.dismiss();
+              router.push(`/ticket/${p.id}`);
+              Alert.alert('Вы присоединились', `${p.number}: новое обращение не создано — статус и результат придут вам.`);
+            }}
+          />
         ) : null}
 
         <Segmented options={TYPES.map((t) => (t === 'PRAISE' ? 'Отзыв' : typeMeta[t].label))} index={TYPES.indexOf(type)} onChange={(i) => { manual.current.type = true; setType(TYPES[i]); }} />
@@ -187,6 +266,18 @@ export default function NewTicket() {
             </View>
           </View>
         </Card>
+
+        {type === 'PROBLEM' ? (
+          <Card>
+            <View style={f.row}>
+              <View style={{ flex: 1, paddingVertical: 10 }}>
+                <Text style={f.rowLabel}>Общая проблема</Text>
+                <Text style={f.routeText}>Коллеги с той же проблемой смогут присоединиться</Text>
+              </View>
+              <Switch value={shared} onValueChange={(v) => { Haptics.selectionAsync(); setShared(v); }} trackColor={{ true: colors.accent }} />
+            </View>
+          </Card>
+        ) : null}
 
         {category ? (
           <View style={f.route}>
@@ -249,5 +340,13 @@ const f = StyleSheet.create({
   title: { fontSize: 17, fontWeight: '600', color: colors.label, paddingHorizontal: 16, height: 50 },
   sep: { height: StyleSheet.hairlineWidth, backgroundColor: colors.separator, marginLeft: 16 },
   area: { fontSize: 16, color: colors.label, paddingHorizontal: 16, paddingTop: 13, paddingBottom: 13, minHeight: 120, lineHeight: 21 },
+  voice: { gap: 8, padding: 12, borderRadius: 16, backgroundColor: colors.accent + '10' },
+  voiceHead: { flexDirection: 'row', gap: 8, alignItems: 'center' },
+  voiceText: { flex: 1, fontSize: 13, color: colors.label, lineHeight: 18 },
+  voiceActions: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
+  voiceBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, backgroundColor: colors.card },
+  voiceBtnText: { fontSize: 13, fontWeight: '600', color: colors.accent },
+  transcript: { fontSize: 13, color: colors.secondary, lineHeight: 18, fontStyle: 'italic' },
+  filled: { borderWidth: 1, borderColor: colors.accent + '40' },
   fileName: { flex: 1, fontSize: 15, color: colors.label },
 });

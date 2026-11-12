@@ -5,12 +5,14 @@ import {
   ScrollView,
   StyleSheet,
 } from 'react-native';
-import { Text } from '@/ui';
+import { PressableScale, Text } from '@/ui';
+import { SymbolView } from 'expo-symbols';
+import { View } from 'react-native';
 import { api, type Status, type TicketType } from '@/api';
 import { isManager, useUser } from '@/auth';
 import { Card, Empty, ErrorBanner, Loading, TicketList, styles } from '@/components';
 import { Segmented } from '@/native';
-import { colors, typeMeta } from '@/theme';
+import { colors, statusMeta, typeMeta } from '@/theme';
 import { useData } from '@/useData';
 
 const GROUPS: { label: string; statuses: Status[] | null }[] = [
@@ -41,6 +43,8 @@ export default function Tickets() {
     [type, sort, overdueOnly],
     `tickets.${type ?? 'all'}.${sort}.${overdueOnly}`,
   );
+
+  const joined = useData(() => api.joinedProblems(), [], 'joined');
 
   const items = useMemo(() => {
     const statuses = GROUPS[group].statuses;
@@ -81,7 +85,7 @@ export default function Tickets() {
         style={styles.screen}
         contentInsetAdjustmentBehavior="automatic"
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={colors.tertiary} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { refresh(); joined.refresh(); }} tintColor={colors.tertiary} />}
       >
         <Segmented options={GROUPS.map((g) => g.label)} index={group} onChange={(i) => setGroup(i)} />
         {error ? <ErrorBanner message={error} onRetry={() => reload()} /> : null}
@@ -90,6 +94,24 @@ export default function Tickets() {
         {data && !items.length ? (
           <Empty icon="tray" title="Пусто" />
         ) : null}
+        {joined.data?.items.length ? (
+          <Card style={local.joined}>
+            <View style={local.joinedHead}>
+              <SymbolView name="person.2.fill" size={15} tintColor={colors.secondary} />
+              <Text style={local.joinedTitle}>Я тоже столкнулся</Text>
+            </View>
+            {joined.data.items.map((p) => (
+              <PressableScale key={p.id} onPress={() => router.push(`/ticket/${p.id}`)} style={local.joinedItem}>
+                <View style={[local.dot, { backgroundColor: statusMeta[p.status].color }]} />
+                <View style={{ flex: 1 }}>
+                  <Text style={local.joinedItemTitle} numberOfLines={1}>{p.title}</Text>
+                  <Text style={local.filterNote}>{p.number} · {statusMeta[p.status].label} · столкнулись {p.affected_count}</Text>
+                </View>
+                <SymbolView name="chevron.right" size={13} tintColor={colors.tertiary as string} />
+              </PressableScale>
+            ))}
+          </Card>
+        ) : null}
       </ScrollView>
     </>
   );
@@ -97,5 +119,11 @@ export default function Tickets() {
 
 const local = StyleSheet.create({
   segment: { height: 34 },
-  filterNote: { fontSize: 13, color: colors.secondary, paddingHorizontal: 4 },
+  filterNote: { fontSize: 13, color: colors.secondary },
+  joined: { padding: 16, gap: 10 },
+  joinedHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  joinedTitle: { fontSize: 15, fontWeight: '600', color: colors.label },
+  joinedItem: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 4 },
+  joinedItemTitle: { fontSize: 15, fontWeight: '500', color: colors.label },
+  dot: { width: 7, height: 7, borderRadius: 4 },
 });
