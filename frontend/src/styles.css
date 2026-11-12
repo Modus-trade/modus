@@ -5433,17 +5433,16 @@ main {
   content: "";
   position: absolute;
   top: 6px;
-  left: 0;
-  right: 0;
+  left: calc(-100% + 7px);
+  right: calc(100% - 7px);
   height: 2px;
+  border-radius: 2px;
   background: #12334d1f;
+  transition: background 0.4s ease;
 }
-.stage-tracker li:first-child::before { left: 7px; }
-.stage-tracker li:last-child::before { right: calc(100% - 7px); }
+.stage-tracker li:first-child::before { display: none; }
 .stage-tracker li.done::before,
 .stage-tracker li.current::before { background: var(--stage); }
-.stage-tracker li.current::before { right: calc(100% - 7px); }
-.stage-tracker li:first-child.current::before { display: none; }
 .stage-dot {
   position: relative;
   width: 14px;
@@ -5622,3 +5621,18 @@ main {
 .insights-note { margin: 8px 0 0; font-size: 13px; }
 .smart-hint.is-idle { background: #f5f7fa; border-style: dashed; }
 .smart-hint.is-idle .smart-hint-body span { color: #526b80; }
+
+/* Аккуратная прокрутка в окнах и списках */
+.modal, .bell-list, .sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: #12334d2e transparent;
+}
+.modal::-webkit-scrollbar, .bell-list::-webkit-scrollbar, .sidebar::-webkit-scrollbar { width: 10px; }
+.modal::-webkit-scrollbar-track, .bell-list::-webkit-scrollbar-track, .sidebar::-webkit-scrollbar-track { background: transparent; margin: 14px 0; }
+.modal::-webkit-scrollbar-thumb, .bell-list::-webkit-scrollbar-thumb, .sidebar::-webkit-scrollbar-thumb {
+  background: #12334d2e;
+  border-radius: 10px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+.modal::-webkit-scrollbar-thumb:hover { background-color: #12334d4d; }
