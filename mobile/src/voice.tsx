@@ -25,7 +25,7 @@ import { colors } from './theme';
 import { PressableScale, Text } from './ui';
 
 /** Моно, 16 кГц, 32 кбит/с: речь распознаётся так же, а минута весит ~240 КБ — загрузка почти мгновенная. */
-const OPTIONS: RecordingOptions = {
+export const OPTIONS: RecordingOptions = {
   ...RecordingPresets.HIGH_QUALITY,
   sampleRate: 16000,
   numberOfChannels: 1,

@@ -69,6 +69,9 @@ export interface Comment {
   body: string;
   is_clarification_request: boolean;
   created_at: string;
+  audio_id?: number | null;
+  audio_seconds?: number | null;
+  transcript?: string | null;
 }
 
 export interface HistoryItem {
@@ -239,6 +242,13 @@ export const api = {
     const form = new FormData();
     form.append('file', new File(file.uri), file.name);
     return request(`/api/tickets/${id}/attachments`, { method: 'POST', body: form });
+  },
+  voiceComment: (id: number, uri: string, seconds: number, clarify: boolean) => {
+    const form = new FormData();
+    form.append('file', new File(uri), 'voice.m4a');
+    form.append('seconds', String(seconds));
+    form.append('is_clarification_request', String(clarify));
+    return request(`/api/tickets/${id}/voice`, { method: 'POST', body: form });
   },
   categories: () => request<Category[]>('/api/categories'),
   assignees: () => request<User[]>('/api/assignees'),
