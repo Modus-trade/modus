@@ -38,6 +38,7 @@ class Ticket(Base):
     __tablename__ = "tickets"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     number: Mapped[str] = mapped_column(String(30), unique=True)
+    source: Mapped[str] = mapped_column(String(20), default="WEB", server_default="WEB")
     type: Mapped[str] = mapped_column(String(20))
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
     title: Mapped[str] = mapped_column(String(250))
@@ -132,6 +133,8 @@ class Notification(Base):
     read_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     __table_args__ = (Index("uq_notification_deduplication_key", "deduplication_key", unique=True),)
 
+# Register integration tables in the shared metadata (also used by test databases).
+from .integration_models import IntegrationSettings, DirectoryEntry, BitrixTask, IntegrationJob  # noqa: E402,F401
 
 class KnowledgeArticle(Base):
     __tablename__ = "knowledge_articles"
