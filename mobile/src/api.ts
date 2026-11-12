@@ -58,6 +58,8 @@ export interface Ticket {
   first_response_at: string | null;
   closed_at: string | null;
   overdue: boolean;
+  is_shared?: boolean;
+  affected_count?: number;
 }
 
 export interface Comment {
@@ -90,6 +92,8 @@ export interface Attachment {
 export const attachmentUrl = (id: number) => `${API_URL}/api/attachments/${id}`;
 
 export interface TicketDetail extends Ticket {
+  /** participant — присоединился к общей проблеме: только просмотр */
+  viewer?: 'member' | 'participant';
   comments: Comment[];
   history: HistoryItem[];
   attachments: Attachment[];
@@ -157,6 +161,16 @@ function safeJson(text: string) {
   }
 }
 
+export interface SharedProblem {
+  id: number;
+  number: string;
+  title: string;
+  status: Status;
+  category_id: number;
+  affected_count: number;
+  joined: boolean;
+}
+
 export interface VoiceResult {
   transcript: string;
   title: string;
@@ -214,6 +228,7 @@ export const api = {
     title: string;
     description: string;
     proposed_solution?: string | null;
+    is_shared?: boolean;
   }) => request<Ticket>('/api/tickets', { method: 'POST', body: json(data) }),
   patch: (id: number, data: Partial<{ status: Status; priority: Priority; assignee_id: number | null; resolution: string }>) =>
     request<Ticket>(`/api/tickets/${id}`, { method: 'PATCH', body: json(data) }),
@@ -230,6 +245,10 @@ export const api = {
   summary: () => request<Summary>('/api/analytics/summary'),
   suggest: (data: { title: string; description: string; image_base64?: string | null }) =>
     request<Suggestion>('/api/assist/suggest', { method: 'POST', body: json(data) }),
+  sharedProblems: (text: string, category_id: number | null) =>
+    request<{ items: SharedProblem[] }>('/api/problems/similar', { method: 'POST', body: json({ text, category_id }) }),
+  joinProblem: (id: number) => request<SharedProblem>(`/api/problems/${id}/join`, { method: 'POST' }),
+  joinedProblems: () => request<{ items: SharedProblem[]; total: number }>('/api/problems/joined'),
   voice: (data: { audio_base64: string; format: string }) =>
     request<VoiceResult>('/api/assist/voice', { method: 'POST', body: json(data) }),
   similar: (id: number) => request<{ items: SimilarItem[]; ai_enabled: boolean }>(`/api/tickets/${id}/similar`),

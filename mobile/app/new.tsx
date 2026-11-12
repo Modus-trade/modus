@@ -8,12 +8,14 @@ import {
   Alert,
   Pressable,
   ScrollView,
+  Switch,
   StyleSheet,
   View,
 } from 'react-native';
 import { PressableScale, Text, TextInput } from '@/ui';
 import { api, firstImageBase64, type Category, type Suggestion, type TicketType, type User, type VoiceResult } from '@/api';
 import { VoiceInput } from '@/voice';
+import { SharedProblems } from '@/shared';
 import { Card, layout, styles } from '@/components';
 import { MenuPicker, Segmented } from '@/native';
 import Animated, { FadeIn, FadeInDown, FadeOut, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
@@ -33,6 +35,7 @@ export default function NewTicket() {
   const [solution, setSolution] = useState('');
   const [files, setFiles] = useState<PickedFile[]>([]);
   const [busy, setBusy] = useState(false);
+  const [shared, setShared] = useState(false);
   // Подсказка типа и категории. То, что сотрудник выбрал сам, она не перезаписывает.
   const [hint, setHint] = useState<Suggestion | null>(null);
   const [hinting, setHinting] = useState(false);
@@ -136,6 +139,7 @@ export default function NewTicket() {
         title: title.trim(),
         description: description.trim(),
         proposed_solution: solution.trim() || null,
+        is_shared: type === 'PROBLEM' && shared,
       });
       const failed: string[] = [];
       for (const f of files) await api.upload(ticket.id, f).catch(() => failed.push(f.name));
@@ -234,6 +238,18 @@ export default function NewTicket() {
           </Animated.View>
         ) : null}
 
+        {type === 'PROBLEM' ? (
+          <SharedProblems
+            text={`${title} ${description}`}
+            categoryId={categoryId}
+            onJoined={(p) => {
+              router.dismiss();
+              router.push(`/ticket/${p.id}`);
+              Alert.alert('Вы присоединились', `${p.number}: новое обращение не создано — статус и результат придут вам.`);
+            }}
+          />
+        ) : null}
+
         <Segmented options={TYPES.map((t) => (t === 'PRAISE' ? 'Отзыв' : typeMeta[t].label))} index={TYPES.indexOf(type)} onChange={(i) => { manual.current.type = true; setType(TYPES[i]); }} />
 
         <Card>
@@ -250,6 +266,18 @@ export default function NewTicket() {
             </View>
           </View>
         </Card>
+
+        {type === 'PROBLEM' ? (
+          <Card>
+            <View style={f.row}>
+              <View style={{ flex: 1, paddingVertical: 10 }}>
+                <Text style={f.rowLabel}>Общая проблема</Text>
+                <Text style={f.routeText}>Коллеги с той же проблемой смогут присоединиться</Text>
+              </View>
+              <Switch value={shared} onValueChange={(v) => { Haptics.selectionAsync(); setShared(v); }} trackColor={{ true: colors.accent }} />
+            </View>
+          </Card>
+        ) : null}
 
         {category ? (
           <View style={f.route}>

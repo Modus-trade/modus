@@ -89,7 +89,8 @@ export default function TicketScreen() {
     );
   }
 
-  const open = !!t && !finalStatuses.includes(t.status);
+  const participant = t?.viewer === 'participant';
+  const open = !!t && !participant && !finalStatuses.includes(t.status);
   const canManage = manager && !!t && t.status !== 'CLOSED';
 
   return (
@@ -144,7 +145,15 @@ export default function TicketScreen() {
           {error ? <ErrorBanner message={error} onRetry={() => reload()} /> : null}
           {!t && !error ? <Loading /> : null}
           {t ? <Body t={t} user={user} assignees={assignees} /> : null}
-          {t && manager ? (
+          {t && participant ? (
+            <Card style={{ padding: 16, flexDirection: 'row', gap: 10 }}>
+              <SymbolView name="person.2.fill" size={18} tintColor={colors.secondary} />
+              <Text style={{ flex: 1, fontSize: 14, lineHeight: 20, color: colors.secondary }}>
+                Вы присоединились к этой общей проблеме. Здесь видно стадию и итоговый результат — уведомления о них придут автоматически. Переписка доступна автору и ответственному.
+              </Text>
+            </Card>
+          ) : null}
+          {t && manager && !participant ? (
             <TicketInsights
               ticketId={t.id}
               final={finalStatuses.includes(t.status)}
@@ -229,7 +238,7 @@ function Body({ t, user, assignees }: { t: TicketDetail; user: User; assignees: 
       ) : null}
 
       <Animated.View entering={enter(3)} style={b.block}>
-        <Text style={b.text}>{t.description}</Text>
+        <Text style={b.text}>{t.viewer === 'participant' ? 'Описание видят автор и ответственный — здесь вы следите за стадией и результатом.' : t.description}</Text>
         {t.proposed_solution ? (
           <>
             <Text style={b.label}>Предлагаемое решение</Text>
@@ -242,7 +251,7 @@ function Body({ t, user, assignees }: { t: TicketDetail; user: User; assignees: 
       {details ? (
         <Animated.View entering={FadeIn.duration(300)} exiting={FadeOut.duration(150)} layout={layout} style={b.details}>
           <Detail label="Категория" value={t.category_name} />
-          <Detail label="Автор" value={`${t.author_name}, ${t.department}`} />
+          {t.viewer !== 'participant' ? <Detail label="Автор" value={`${t.author_name}, ${t.department}`} /> : null}
           <Detail label="Подано" value={formatDate(t.created_at, true)} />
           <Detail label="Первый ответ" value={t.first_response_at ? formatDate(t.first_response_at, true) : `ожидается до ${formatDate(t.due_at, true)}`} />
           <Detail label="Приоритет" value={priorityMeta[t.priority].label} />
