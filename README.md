@@ -1,3 +1,27 @@
+> Локальная рабочая пара: **`modus-back` + `modus-front`**. Запуск на macOS — `./start.command`.
+> API: `http://127.0.0.1:8000`, интерфейс: `http://127.0.0.1:5173`.
+> Настройки API находятся в `modus-back/.env`; запросы `/api` и WebSocket `/api/ws`
+> из `modus-front` направляются в этот API. По умолчанию используется локальная SQLite.
+> Общая база подключается отдельно через `DATABASE_URL`; одного подключения фронтенда
+> к API недостаточно для синхронизации данных между разными компьютерами.
+
+Первичная установка этой пары (macOS / Linux):
+
+```bash
+# Если отдельных репозиториев ещё нет рядом:
+git clone https://github.com/Modus-trade/modus-back.git modus-back
+git clone https://github.com/Modus-trade/modus-front.git modus-front
+cd modus-back
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/alembic upgrade head
+.venv/bin/python seed.py
+cd ../modus-front
+npm ci
+cd ..
+./start.command
+```
+
 <div align="center">
 
 <img src="docs/banner.svg" alt="Модус Трейд" width="720">

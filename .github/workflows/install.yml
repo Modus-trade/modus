@@ -33,14 +33,14 @@ jobs:
           python seed.py
       - name: "Шаг 4: сайт"
         run: |
-          cd modus-front
+          cd frontend
           npm ci
       - name: "Шаг 5: запуск (uvicorn + npm run dev), сайт открывается, вход работает"
         run: |
           # Запуск и проверка в одном шаге: Windows-раннер закрывает фоновые процессы в конце шага.
           $root = (Get-Location).Path
           Start-Process -FilePath "$root\backend\.venv\Scripts\uvicorn.exe" -ArgumentList "app.main:app","--port","8000" -WorkingDirectory "$root\backend" -RedirectStandardOutput "$root\backend.log" -RedirectStandardError "$root\backend.err"
-          Start-Process -FilePath npm.cmd -ArgumentList "run","dev" -WorkingDirectory "$root\modus-front" -RedirectStandardOutput "$root\frontend.log" -RedirectStandardError "$root\frontend.err"
+          Start-Process -FilePath npm.cmd -ArgumentList "run","dev" -WorkingDirectory "$root\frontend" -RedirectStandardOutput "$root\frontend.log" -RedirectStandardError "$root\frontend.err"
           $ok = $false
           foreach ($i in 1..60) { try { Invoke-WebRequest http://127.0.0.1:5173 -UseBasicParsing -TimeoutSec 5 | Out-Null; $ok = $true; break } catch { Start-Sleep 2 } }
           if (-not $ok) { throw "Сайт не открылся" }
@@ -75,7 +75,7 @@ jobs:
           nohup uvicorn app.main:app --port 8000 > ../backend.log 2>&1 &
       - name: "Терминал 2: сайт"
         run: |
-          cd modus-front
+          cd frontend
           npm ci
           nohup npm run dev > ../frontend.log 2>&1 &
       - name: Сайт открывается, вход работает
@@ -83,7 +83,7 @@ jobs:
       - name: Тесты
         run: |
           (cd backend && .venv/bin/python -m pytest -q)
-          (cd modus-front && npm test && npm run build)
+          (cd frontend && npm test && npm run build)
       - name: Логи при ошибке
         if: failure()
         run: cat backend.log frontend.log || true

@@ -7,7 +7,12 @@ __pycache__/
 *.db
 *.db-*
 backend/uploads/
+modus-back/uploads/
 .env
 *.tsbuildinfo
 .python/
 !.env.example
+
+# Separate working repositories; canonical frontend/backend are synced by CI.
+/modus-front/
+/modus-back/
