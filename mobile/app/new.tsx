@@ -2,7 +2,7 @@ import { AttachMenu, type PickedFile } from '@/attach';
 import { Haptics } from '@/settings';
 import { Stack, useRouter } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import { PressableScale, Text, TextInput } from '@/ui';
-import { api, type Category, type TicketType, type User } from '@/api';
+import { api, firstImageBase64, type Category, type Suggestion, type TicketType, type User } from '@/api';
 import { Card, layout, styles } from '@/components';
 import { MenuPicker, Segmented } from '@/native';
 import Animated, { FadeIn, FadeInDown, FadeOut, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
@@ -32,11 +32,45 @@ export default function NewTicket() {
   const [solution, setSolution] = useState('');
   const [files, setFiles] = useState<PickedFile[]>([]);
   const [busy, setBusy] = useState(false);
+  // Подсказка типа и категории. То, что сотрудник выбрал сам, она не перезаписывает.
+  const [hint, setHint] = useState<Suggestion | null>(null);
+  const [hinting, setHinting] = useState(false);
+  const manual = useRef({ type: false, category: false });
+  const hintSeq = useRef(0);
 
   useEffect(() => {
     api.categories().then(setCategories).catch((e) => Alert.alert('Ошибка', e.message));
     api.assignees().then(setAssignees).catch(() => undefined);
   }, []);
+
+  const imageKey = files.map((f) => f.uri).join('|');
+  useEffect(() => {
+    if (title.trim().length + description.trim().length < 20) return;
+    const id = ++hintSeq.current;
+    const timer = setTimeout(async () => {
+      setHinting(true);
+      try {
+        const s = await api.suggest({ title, description, image_base64: await firstImageBase64(files) });
+        if (id !== hintSeq.current) return;
+        setHint(s);
+        if (!manual.current.type) setType(s.type);
+        if (!manual.current.category && s.category_id) setCategoryId(s.category_id);
+      } catch {
+        // Подсказка необязательна.
+      } finally {
+        if (id === hintSeq.current) setHinting(false);
+      }
+    }, 900);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [title, description, imageKey]);
+
+  function applyHint() {
+    if (!hint) return;
+    Haptics.selectionAsync();
+    setType(hint.type);
+    if (hint.category_id) setCategoryId(hint.category_id);
+  }
 
   const category = categories.find((c) => c.id === categoryId) ?? null;
   const assignee = useMemo(
@@ -99,31 +133,6 @@ export default function NewTicket() {
         keyboardDismissMode="interactive"
         automaticallyAdjustKeyboardInsets
       >
-        <Segmented options={TYPES.map((t) => (t === 'PRAISE' ? 'Отзыв' : typeMeta[t].label))} index={TYPES.indexOf(type)} onChange={(i) => setType(TYPES[i])} />
-
-        <Card>
-          <View style={f.row}>
-            <Text style={[f.rowLabel, { flexShrink: 0 }]}>Категория</Text>
-            <View style={{ flex: 1, minWidth: 0, flexDirection: 'row', marginLeft: 12 }}>
-              <MenuPicker
-                value={categoryId}
-                placeholder="Выбрать"
-                color={colors.secondary}
-                options={categories.map((c) => ({ value: c.id, label: c.name }))}
-                onChange={setCategoryId}
-              />
-            </View>
-          </View>
-        </Card>
-
-        {category ? (
-          <View style={f.route}>
-                        <Text style={f.routeText}>
-              {assignee ? `Получит ${assignee.full_name} · ответ до ${category.sla_first_response_hours} ч` : 'Ответственного назначит администратор'}
-            </Text>
-          </View>
-        ) : null}
-
         <Card>
           <TextInput style={f.title} placeholder="Тема" placeholderTextColor={colors.tertiary} value={title} onChangeText={setTitle} maxLength={250} />
           <View style={f.sep} />
@@ -137,6 +146,55 @@ export default function NewTicket() {
             textAlignVertical="top"
           />
         </Card>
+
+        {hint || hinting ? (
+          <Animated.View entering={FadeIn.duration(300)} style={f.hint}>
+            <SymbolView name="sparkles" size={17} tintColor={colors.accent} />
+            <View style={{ flex: 1, gap: 2 }}>
+              {hint ? (
+                <>
+                  <Text style={f.hintTitle}>
+                    {(hint.type === 'PRAISE' ? 'Отзыв' : typeMeta[hint.type].label) + (hint.category ? ` · ${hint.category}` : '')}
+                  </Text>
+                  {hint.reason ? <Text style={f.hintText}>«{hint.reason}»</Text> : null}
+                  <Text style={f.hintSource}>{hint.source === 'ai' ? 'Подобрано ИИ' : 'Подобрано автоматически'} · можно поменять</Text>
+                </>
+              ) : (
+                <Text style={f.hintText}>Подбираем тип и категорию…</Text>
+              )}
+            </View>
+            {hint && (hint.type !== type || (hint.category_id && hint.category_id !== categoryId)) ? (
+              <PressableScale onPress={applyHint} style={f.hintApply}>
+                <Text style={f.hintApplyText}>Применить</Text>
+              </PressableScale>
+            ) : null}
+          </Animated.View>
+        ) : null}
+
+        <Segmented options={TYPES.map((t) => (t === 'PRAISE' ? 'Отзыв' : typeMeta[t].label))} index={TYPES.indexOf(type)} onChange={(i) => { manual.current.type = true; setType(TYPES[i]); }} />
+
+        <Card>
+          <View style={f.row}>
+            <Text style={[f.rowLabel, { flexShrink: 0 }]}>Категория</Text>
+            <View style={{ flex: 1, minWidth: 0, flexDirection: 'row', marginLeft: 12 }}>
+              <MenuPicker
+                value={categoryId}
+                placeholder="Выбрать"
+                color={colors.secondary}
+                options={categories.map((c) => ({ value: c.id, label: c.name }))}
+                onChange={(v) => { manual.current.category = true; setCategoryId(v); }}
+              />
+            </View>
+          </View>
+        </Card>
+
+        {category ? (
+          <View style={f.route}>
+                        <Text style={f.routeText}>
+              {assignee ? `Получит ${assignee.full_name} · ответ до ${category.sla_first_response_hours} ч` : 'Ответственного назначит администратор'}
+            </Text>
+          </View>
+        ) : null}
 
         {type !== 'PRAISE' ? (
           <Card>
@@ -177,12 +235,17 @@ const f = StyleSheet.create({
   options: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.separator, paddingVertical: 4 },
   option: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 11, gap: 10 },
   optionText: { flex: 1, fontSize: 15, color: colors.secondary },
-  hint: { fontSize: 13, color: colors.secondary, paddingHorizontal: 4, lineHeight: 18 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, minHeight: 50 },
   rowLabel: { fontSize: 17, color: colors.label },
   rowValue: { flex: 1, textAlign: 'right', fontSize: 17, color: colors.secondary },
   route: { flexDirection: 'row', gap: 8, paddingHorizontal: 6, alignItems: 'center' },
   routeText: { flex: 1, fontSize: 13, color: colors.secondary, lineHeight: 18 },
+  hint: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, padding: 14, borderRadius: 18, backgroundColor: colors.card, borderWidth: StyleSheet.hairlineWidth, borderColor: colors.separator },
+  hintTitle: { fontSize: 15, fontWeight: '600', color: colors.label },
+  hintText: { fontSize: 13, color: colors.secondary, lineHeight: 18 },
+  hintSource: { fontSize: 12, color: colors.tertiary },
+  hintApply: { alignSelf: 'center', paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999, backgroundColor: colors.accent },
+  hintApplyText: { fontSize: 13, fontWeight: '600', color: '#fff' },
   title: { fontSize: 17, fontWeight: '600', color: colors.label, paddingHorizontal: 16, height: 50 },
   sep: { height: StyleSheet.hairlineWidth, backgroundColor: colors.separator, marginLeft: 16 },
   area: { fontSize: 16, color: colors.label, paddingHorizontal: 16, paddingTop: 13, paddingBottom: 13, minHeight: 120, lineHeight: 21 },

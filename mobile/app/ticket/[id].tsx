@@ -24,6 +24,7 @@ import { isManager, useUser } from '@/auth';
 import { Card, enter, ErrorBanner, layout, Loading, StageTracker, StatusDot, styles } from '@/components';
 import { colors, finalStatuses, formatDate, priorityMeta, relative, shadow, statusMeta, transitions, typeMeta } from '@/theme';
 import { useData } from '@/useData';
+import { TicketInsights } from '@/insights';
 
 export default function TicketScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -32,6 +33,7 @@ export default function TicketScreen() {
   const insets = useSafeAreaInsets();
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   const [assignees, setAssignees] = useState<User[]>([]);
+  const [draft, setDraft] = useState<{ text: string; at: number } | null>(null);
   const { data: t, error, refreshing, refresh, reload, setData } = useData(() => api.ticket(id), [id], `ticket.${id}`);
 
   useEffect(() => {
@@ -73,7 +75,7 @@ export default function TicketScreen() {
     } else mutate(() => api.patch(t.id, { status }));
   }
 
-  function editResolution() {
+  function editResolution(prefill?: string) {
     if (!t) return;
     Alert.prompt(
       'Результат рассмотрения',
@@ -83,7 +85,7 @@ export default function TicketScreen() {
         { text: 'Сохранить', onPress: (text?: string) => text?.trim() && mutate(() => api.patch(t.id, { resolution: text.trim() })) },
       ],
       'plain-text',
-      t.resolution ?? '',
+      prefill ?? t.resolution ?? '',
     );
   }
 
@@ -122,7 +124,7 @@ export default function TicketScreen() {
                 </Stack.Toolbar.MenuAction>
               ))}
             </Stack.Toolbar.Menu>
-            <Stack.Toolbar.MenuAction icon="text.badge.checkmark" onPress={editResolution}>
+            <Stack.Toolbar.MenuAction icon="text.badge.checkmark" onPress={() => editResolution()}>
               {t.resolution ? 'Изменить результат' : 'Записать результат'}
             </Stack.Toolbar.MenuAction>
           </Stack.Toolbar.Menu>
@@ -142,12 +144,21 @@ export default function TicketScreen() {
           {error ? <ErrorBanner message={error} onRetry={() => reload()} /> : null}
           {!t && !error ? <Loading /> : null}
           {t ? <Body t={t} user={user} assignees={assignees} /> : null}
+          {t && manager ? (
+            <TicketInsights
+              ticketId={t.id}
+              final={finalStatuses.includes(t.status)}
+              onUseReply={(text) => setDraft({ text, at: Date.now() })}
+              onUseResult={(text) => editResolution(text)}
+            />
+          ) : null}
         </ScrollView>
         {t && open ? (
           <Composer
             ticket={t}
             manager={manager && t.author_id !== user.id}
             bottom={insets.bottom}
+            draft={draft}
             onAttach={(files) =>
               mutate(async () => {
                 for (const f of files) await api.upload(t.id, f);
@@ -420,10 +431,12 @@ function Composer({
   bottom,
   onSend,
   onAttach,
+  draft,
 }: {
   ticket: TicketDetail;
   manager: boolean;
   bottom: number;
+  draft?: { text: string; at: number } | null;
   onSend: (body: string, clarify: boolean) => Promise<boolean>;
   onAttach: (files: PickedFile[]) => Promise<boolean>;
 }) {
@@ -435,6 +448,10 @@ function Composer({
   });
   const [text, setText] = useState('');
   const [clarify, setClarify] = useState(false);
+  // Черновик ответа от ИИ: подставляем в поле, дальше человек правит и отправляет сам.
+  useEffect(() => {
+    if (draft) setText(draft.text);
+  }, [draft]);
   const [sending, setSending] = useState(false);
   const glass = isLiquidGlassAvailable();
   const Container = glass ? GlassView : View;

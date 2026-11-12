@@ -157,6 +157,35 @@ function safeJson(text: string) {
   }
 }
 
+export interface Suggestion {
+  type: TicketType;
+  category_id: number | null;
+  category: string | null;
+  assignee_name: string | null;
+  sla_hours: number | null;
+  confidence: number;
+  reason: string;
+  source: 'ai' | 'rules';
+}
+
+export interface SimilarItem {
+  id: number;
+  number: string;
+  title: string;
+  status: Status;
+  category: string;
+  resolution: string | null;
+  score: number;
+}
+
+export interface Solution {
+  summary: string;
+  steps: string[];
+  based_on: string[];
+  reply_draft: string;
+  source: 'ai' | 'rules';
+}
+
 const json = (data: unknown) => JSON.stringify(data);
 
 export const api = {
@@ -192,7 +221,22 @@ export const api = {
   categories: () => request<Category[]>('/api/categories'),
   assignees: () => request<User[]>('/api/assignees'),
   summary: () => request<Summary>('/api/analytics/summary'),
+  suggest: (data: { title: string; description: string; image_base64?: string | null }) =>
+    request<Suggestion>('/api/assist/suggest', { method: 'POST', body: json(data) }),
+  similar: (id: number) => request<{ items: SimilarItem[]; ai_enabled: boolean }>(`/api/tickets/${id}/similar`),
+  solve: (id: number) => request<Solution>(`/api/tickets/${id}/solve`, { method: 'POST' }),
 };
+
+/** Первое фото (до 4 МБ) в base64 — чтобы ИИ учёл и картинку. */
+export async function firstImageBase64(files: { uri: string; mimeType?: string; size?: number }[]) {
+  const photo = files.find((f) => f.mimeType?.startsWith('image/') && (!f.size || f.size <= 4 * 1024 * 1024));
+  if (!photo) return null;
+  try {
+    return await new File(photo.uri).base64();
+  } catch {
+    return null;
+  }
+}
 
 /** Сервер отдаёт даты в UTC без суффикса зоны. */
 export function parseDate(value: string | null | undefined): Date | null {
