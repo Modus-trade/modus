@@ -90,3 +90,41 @@ def test_voice_unavailable(clients, monkeypatch):
     monkeypatch.setattr(ai, "voice", lambda a, f: None)
     r = clients[0].post("/api/assist/voice", json={"audio_base64": "A" * 200, "format": "m4a"})
     assert r.status_code == 503
+
+
+def test_participant_sees_shared_problem_read_only(clients):
+    employee, other = clients[0], clients[1]
+    r = employee.post("/api/tickets", json={"type": "PROBLEM", "category_id": 1, "title": "Общая проблема со статусами",
+                                            "description": "Статусы заявок не совпадают в системах", "is_shared": True})
+    assert r.status_code in (200, 201), r.text
+    ticket_id = r.json()["id"]
+    assert other.get(f"/api/tickets/{ticket_id}").status_code == 404
+    assert other.post(f"/api/problems/{ticket_id}/join").status_code == 200
+    detail = other.get(f"/api/tickets/{ticket_id}")
+    assert detail.status_code == 200 and detail.json()["viewer"] == "participant"
+    assert detail.json()["comments"] == []
+    assert other.post(f"/api/tickets/{ticket_id}/comments", json={"body": "и у меня"}).status_code == 404
+    assert employee.get(f"/api/tickets/{ticket_id}").json()["viewer"] == "member"
+
+
+def test_voice_comment_with_transcript(clients, monkeypatch, tmp_path):
+    employee = clients[0]
+    monkeypatch.setenv("AI_URL", "http://ai.test")
+    monkeypatch.setattr(ai, "transcribe", lambda a, f: "в 1С не видно оплату")
+    from app.routers import tickets as tickets_router
+    from sqlalchemy.orm import sessionmaker
+    from app.database import get_db
+    from app.main import app as fastapi_app
+    gen = fastapi_app.dependency_overrides[get_db]()
+    db = next(gen)
+    monkeypatch.setattr("app.database.SessionLocal", sessionmaker(db.get_bind(), expire_on_commit=False))
+    ticket_id = ticket(employee, "Оплата не видна", "Счёт оплачен в 1С, в Битриксе старый статус")["id"]
+    r = employee.post(f"/api/tickets/{ticket_id}/voice", files={"file": ("voice.m4a", b"x" * 2000, "audio/mp4")}, data={"seconds": "7"})
+    assert r.status_code == 201, r.text
+    detail = employee.get(f"/api/tickets/{ticket_id}").json()
+    voice = detail["comments"][-1]
+    assert voice["audio_id"] and voice["audio_seconds"] == 7
+    assert voice["transcript"] == "в 1С не видно оплату"
+    assert all(a["id"] != voice["audio_id"] for a in detail["attachments"])
+    assert employee.get(f"/api/attachments/{voice['audio_id']}").status_code == 200
+    assert employee.post(f"/api/tickets/{ticket_id}/voice", files={"file": ("x.exe", b"x" * 2000)}).status_code == 422

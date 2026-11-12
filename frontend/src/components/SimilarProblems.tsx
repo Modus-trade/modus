@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Users, Layers, Check } from "lucide-react";
@@ -166,12 +167,11 @@ export function JoinedProblems() {
         </h3>
       </div>
       <p>
-        Статусы общих проблем, к которым вы присоединились. Переписка и
-        материалы доступны автору и ответственным по обычным правилам.
+        Общие проблемы, к которым вы присоединились: откройте, чтобы увидеть стадию и результат.
       </p>
       <div className="joined-problem-list">
         {query.data.items.map((item) => (
-          <article key={item.id}>
+          <Link key={item.id} to={`/tickets/${item.id}`} className="joined-problem">
             <span className="ticket-number">{item.number}</span>
             <strong>{item.title}</strong>
             <Badge status={item.status} />
@@ -179,7 +179,7 @@ export function JoinedProblems() {
               <Users size={14} />
               {item.affected_count}
             </span>
-          </article>
+          </Link>
         ))}
       </div>
       {query.data.total > 20 && (

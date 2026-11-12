@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { TicketInsights } from "./components/TicketInsights";
+import { VoicePlayer, VoiceRecorder } from "./components/VoiceMessage";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -11,6 +12,7 @@ import {
   CheckCircle2,
   MessageSquare,
   History as HistoryIcon,
+  Users,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -74,6 +76,7 @@ export default function TicketDetail({ user }: { user: User }) {
   if (!t) return <Failure retry={() => query.refetch()} />;
   const manager = user.role !== "EMPLOYEE";
   const final = ["CLOSED", "IMPLEMENTED", "REJECTED"].includes(t.status);
+  const participant = t.viewer === "participant";
   function historyValue(field: string, value: string | null) {
     if (field === "resolution_due_at") return value ? formatDeadline(value) : "Не назначен";
     if (field === "resolution") return value || "Не указан";
@@ -121,6 +124,20 @@ export default function TicketDetail({ user }: { user: User }) {
       setBusy(false);
     }
   }
+  async function sendVoice(file: File, seconds: number) {
+    const data = new FormData();
+    data.append("file", file);
+    data.append("seconds", String(seconds));
+    data.append("is_clarification_request", String(clarify && t?.status !== "AWAITING_CLARIFICATION"));
+    try {
+      await api.post(`/tickets/${id}/voice`, data);
+      setClarify(false);
+      await qc.invalidateQueries();
+      toast.success("Голосовое отправлено");
+    } catch (e) {
+      toast.error(errorMessage(e));
+    }
+  }
   async function upload(file: File) {
     const data = new FormData();
     data.append("file", file);
@@ -164,7 +181,11 @@ export default function TicketDetail({ user }: { user: User }) {
                 Общая проблема · столкнулись {t.affected_count} {[2,3,4].includes((t.affected_count ?? 0) % 10) && ![12,13,14].includes((t.affected_count ?? 0) % 100) ? "сотрудника" : "сотрудников"}
               </p>
             )}
-            <p className="ticket-description">{t.description}</p>
+            {participant ? (
+              <p className="muted">Описание видят автор и ответственный — здесь вы следите за стадией и результатом.</p>
+            ) : (
+              <p className="ticket-description">{t.description}</p>
+            )}
             {t.proposed_solution && (
               <>
                 <h4>Предполагаемое решение</h4>
@@ -215,7 +236,7 @@ export default function TicketDetail({ user }: { user: User }) {
                 ))}
             </div>
             {photo !== null && <PhotoViewer id={photo} onClose={() => setPhoto(null)} />}
-            {!final && (
+            {!final && !participant && (
               <label className="attach-action">
                 <Paperclip size={15} />
                 Прикрепить файл
@@ -232,6 +253,16 @@ export default function TicketDetail({ user }: { user: User }) {
               </label>
             )}
           </section>
+          {participant ? (
+            <section className="panel padded participant-note">
+              <Users size={18} />
+              <p>
+                Вы присоединились к этой общей проблеме. Здесь видно стадию и итоговый результат,
+                уведомления о них придут вам автоматически. Переписка доступна автору и ответственному.
+              </p>
+            </section>
+          ) : (
+          <>
           <ResolutionReview ticket={t} user={user} />
           <section className="panel">
             <AnimatedTabs value={tab} label="Раздел обращения">
@@ -318,7 +349,15 @@ export default function TicketDetail({ user }: { user: User }) {
                       {c.is_clarification_request && (
                         <span className="clarify-tag">Запрос уточнения</span>
                       )}
-                      <p>{c.body}</p>
+                      {c.audio_id ? (
+                        <VoicePlayer
+                          src={`/api/attachments/${c.audio_id}`}
+                          seconds={c.audio_seconds ?? null}
+                          transcript={c.transcript ?? null}
+                        />
+                      ) : (
+                        <p>{c.body}</p>
+                      )}
                     </article>
                   ))}
                   {!final ? (
@@ -351,10 +390,13 @@ export default function TicketDetail({ user }: { user: User }) {
                         ) : (
                           <span />
                         )}
-                        <Button loading={busy} disabled={busy || !body.trim()}>
-                          <Send size={15} />
-                          Отправить
-                        </Button>
+                        <div className="comment-send">
+                          {!body.trim() && <VoiceRecorder disabled={busy} onSend={sendVoice} />}
+                          <Button loading={busy} disabled={busy || !body.trim()}>
+                            <Send size={15} />
+                            Отправить
+                          </Button>
+                        </div>
                       </div>
                     </form>
                   ) : (
@@ -367,16 +409,22 @@ export default function TicketDetail({ user }: { user: User }) {
               )}
             </div>
           </section>
+          </>
+          )}
         </div>
         <aside className="detail-side">
           <section className="panel padded">
             <h3>Детали обращения</h3>
             <dl>
-              <dt>Автор</dt>
-              <dd>
-                {t.author_name}
-                <small>{t.department}</small>
-              </dd>
+              {!participant && (
+                <>
+                  <dt>Автор</dt>
+                  <dd>
+                    {t.author_name}
+                    <small>{t.department}</small>
+                  </dd>
+                </>
+              )}
               <dt>Ответственный</dt>
               <dd>{t.assignee_name || "Не назначен"}</dd>
               <dt>Приоритет</dt>

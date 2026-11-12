@@ -84,6 +84,8 @@ export interface Category {
 }
 export interface Ticket {
   is_shared: boolean;
+  /** participant — присоединился к общей проблеме: только просмотр */
+  viewer?: "member" | "participant";
   affected_count: number;
   id: number;
   number: string;
@@ -134,6 +136,9 @@ export interface Comment {
   body: string;
   is_clarification_request: boolean;
   created_at: string;
+  audio_id?: number | null;
+  audio_seconds?: number | null;
+  transcript?: string | null;
 }
 export interface History {
   id: number;
