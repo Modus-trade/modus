@@ -45,8 +45,14 @@ export default function NewTicket() {
 
   const imageKey = files.map((f) => f.uri).join('|');
   useEffect(() => {
-    if (title.trim().length + description.trim().length < 20) return;
     const id = ++hintSeq.current;
+    if (title.trim().length + description.trim().length < 20) {
+      // Текст стёрли — убираем устаревшую подсказку и то, что она подставила.
+      setHint(null);
+      setHinting(false);
+      if (!manual.current.category) setCategoryId(null);
+      return;
+    }
     const timer = setTimeout(async () => {
       setHinting(true);
       try {
@@ -54,7 +60,7 @@ export default function NewTicket() {
         if (id !== hintSeq.current) return;
         setHint(s);
         if (!manual.current.type) setType(s.type);
-        if (!manual.current.category && s.category_id) setCategoryId(s.category_id);
+        if (!manual.current.category) setCategoryId(s.category_id);
       } catch {
         // Подсказка необязательна.
       } finally {
@@ -157,6 +163,7 @@ export default function NewTicket() {
                     {(hint.type === 'PRAISE' ? 'Отзыв' : typeMeta[hint.type].label) + (hint.category ? ` · ${hint.category}` : '')}
                   </Text>
                   {hint.reason ? <Text style={f.hintText}>«{hint.reason}»</Text> : null}
+                  {!hint.category_id ? <Text style={f.hintText}>Категорию не удалось определить — выберите ниже</Text> : null}
                   <Text style={f.hintSource}>{hint.source === 'ai' ? 'Подобрано ИИ' : 'Подобрано автоматически'} · можно поменять</Text>
                 </>
               ) : (
