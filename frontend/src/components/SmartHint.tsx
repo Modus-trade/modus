@@ -59,8 +59,12 @@ export function SmartHint({
   const imageKey = files.map((f) => f.name + f.size).join("|");
 
   useEffect(() => {
-    if (!enabled || title.trim().length + description.trim().length < 20) return;
     const id = ++seq.current;
+    if (!enabled || title.trim().length + description.trim().length < 20) {
+      setHint(null);
+      setLoading(false);
+      return;
+    }
     const timer = setTimeout(async () => {
       setLoading(true);
       try {
@@ -113,6 +117,7 @@ export function SmartHint({
             {hint.sla_hours ? `, ответ до ${hint.sla_hours} ч` : ""}
           </span>
           {hint.reason ? <small>«{hint.reason}»</small> : null}
+          {!hint.category_id ? <small>Категорию не удалось определить — выберите ниже</small> : null}
           <small className="smart-hint-source">
             {hint.source === "ai" ? "Подобрано ИИ" : "Подобрано автоматически по словам"} · можно поменять ниже
           </small>
