@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => ({
     proxy: {
       // ws: true — пробрасываем и WebSocket /api/ws (живые события).
       "/api": {
-        target: loadEnv(mode, ".", "").API_TARGET || "http://127.0.0.1:8000",
+        target: process.env.API_TARGET || loadEnv(mode, ".", "").API_TARGET || "http://127.0.0.1:8000",
         ws: true,
       },
     },
