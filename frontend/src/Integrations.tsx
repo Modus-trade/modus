@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { api, errorMessage, type User } from "./lib";
 import { Button } from "./components/ui/button";
 import { Loading, Failure } from "./components/common";
+import { AnimatedTabs } from "./components/motion";
 import "./integrations.css";
 import BitrixBotPanel from "./components/BitrixBotPanel";
 
@@ -136,22 +137,23 @@ export default function Integrations() {
   ).length;
   return (
     <div className="integration-page">
-      <header className="integration-heading">
-        <span className="eyebrow">ЕДИНОЕ РАБОЧЕЕ ПРОСТРАНСТВО</span>
-        <h1>
-          Связь с Битрикс24
-          <span className={`integration-mode ${d.mode}`}>
-            {d.mode === "real"
-              ? "Реальный портал"
-              : d.mode === "mock"
-                ? "МОК · демо"
-                : "Выключено"}
-          </span>
-        </h1>
-        <p className="muted">
-          Сотрудники, задачи и события — рядом с обращениями.
-        </p>
-      </header>
+      <div className="page-heading">
+        <div>
+          <span className="eyebrow">ЕДИНОЕ РАБОЧЕЕ ПРОСТРАНСТВО</span>
+          <h1>
+            Связь с Битрикс24
+            <span className={`integration-mode ${d.mode}`}>
+              <i />
+              {d.mode === "real"
+                ? "Реальный портал"
+                : d.mode === "mock"
+                  ? "МОК · демо"
+                  : "Выключено"}
+            </span>
+          </h1>
+          <p>Сотрудники, задачи и события — рядом с обращениями.</p>
+        </div>
+      </div>
       <section className="integration-hero">
         <div>
           <Network size={32} />
@@ -166,19 +168,28 @@ export default function Integrations() {
           <small>Последний импорт: {exchangeDate(d.synced_at)}</small>
         </div>
         <div className="integration-controls">
-          <label>
-            Режим обмена
-            <select
-              aria-label="Режим обмена"
-              disabled={busy}
-              value={d.mode}
-              onChange={(e) => action("/mode", { mode: e.target.value }, "put")}
-            >
-              <option value="off">Выключено</option>
-              <option value="mock">МОК · демо без интернета</option>
-              <option value="real">Реальный портал</option>
-            </select>
-          </label>
+          <div className="integration-mode-switch" role="radiogroup" aria-label="Режим обмена">
+            <span>Режим обмена</span>
+            <div>
+              {[
+                ["off", "Выключено"],
+                ["mock", "МОК · демо"],
+                ["real", "Реальный портал"],
+              ].map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  role="radio"
+                  aria-checked={d.mode === value}
+                  className={d.mode === value ? "selected" : ""}
+                  disabled={busy}
+                  onClick={() => d.mode !== value && action("/mode", { mode: value }, "put")}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="integration-actions">
             <Button
               variant="outline"
@@ -198,23 +209,24 @@ export default function Integrations() {
           </div>
         </div>
       </section>
-      <div className="integration-metrics">
-        <article>
-          <Building2 />
-          <strong>{departments.length}</strong>
-          <span>подразделений</span>
-        </article>
-        <article>
-          <Network />
-          <strong>{employees.length}</strong>
-          <span>сотрудников</span>
-        </article>
-        <article>
-          <BellRing />
-          <strong>{problems}</strong>
-          <span>ошибок в последних 100 событиях</span>
-        </article>
-      </div>
+      <section className="metrics integration-metrics">
+        {[
+          { label: "Подразделений", value: departments.length, note: "Из оргструктуры портала", icon: Building2 },
+          { label: "Сотрудников", value: employees.length, note: "Синхронизировано с Модусом", icon: Network },
+          { label: "Ошибок обмена", value: problems, note: "В последних 100 событиях", icon: BellRing },
+        ].map(({ label, value, note, icon: Icon }) => (
+          <div className="metric" key={label}>
+            <div className="metric-top">
+              <span>{label}</span>
+              <span className="metric-icon">
+                <Icon size={18} />
+              </span>
+            </div>
+            <div className="metric-value">{value}</div>
+            <div className="metric-note">{note}</div>
+          </div>
+        ))}
+      </section>
       <details className="panel padded integration-diagnostics">
         <summary>Состояние подключения и ссылки</summary>
         <pre>
@@ -237,7 +249,7 @@ export default function Integrations() {
         )}
       </details>
       <BitrixBotPanel key={d.mode} mode={d.mode} people={d.directory} />
-      <div className="integration-tabs" role="tablist">
+      <AnimatedTabs value={tab} label="Раздел интеграции">
         {[
           ["employees", "Сотрудники"],
           ["departments", "Оргструктура"],
@@ -253,12 +265,12 @@ export default function Integrations() {
             {label}
           </button>
         ))}
-      </div>
+      </AnimatedTabs>
       {tab === "employees" && (
         <section className="panel padded">
           <div className="integration-section-head">
             <div>
-              <h2>Синхронизация сотрудников</h2>
+              <h3>Синхронизация сотрудников</h3>
               <p className="muted">
                 Импорт не выдаёт права администратора и не меняет пароль.
                 Существующий аккаунт можно связать вручную.

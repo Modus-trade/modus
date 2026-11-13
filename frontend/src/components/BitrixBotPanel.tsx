@@ -82,10 +82,10 @@ export default function BitrixBotPanel({
     <section className="panel padded bitrix-bot-panel">
       <div className="integration-section-head">
         <div>
-          <div className="bitrix-task-heading">
-            <Bot size={25} />
-            <h2>Обращение — прямо из чата</h2>
-          </div>
+          <h3 className="bitrix-bot-title">
+            <Bot size={18} />
+            Обращение — прямо из чата
+          </h3>
           <p className="muted">
             Бот «Модус · Обращения» помогает описать проблему, выбрать категорию
             и найти похожие обращения.
@@ -119,14 +119,15 @@ export default function BitrixBotPanel({
             <span>02 · Категория и похожие</span>
             <span>03 · Подтверждение</span>
           </div>
-          <p>
+          <div className="bot-status">
             <span
               className={`exchange-state ${q.data?.enabled ? "sent" : "skipped"}`}
             >
+              <i />
               {q.data?.enabled ? "Включён" : "Выключен"}
-            </span>{" "}
-            {q.data?.health}
-          </p>
+            </span>
+            <span>{q.data?.health}</span>
+          </div>
           {q.data?.external_id && (
             <p className="muted">
               ID бота: {q.data.external_id}. В Битрикс24 откройте мессенджер,

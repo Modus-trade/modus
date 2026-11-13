@@ -3,12 +3,7 @@
   gap: 24px;
   animation: integration-enter 0.5s ease both;
 }
-.integration-heading h1 {
-  display: flex;
-  gap: 18px;
-  align-items: center;
-  flex-wrap: wrap;
-}
+
 .integration-mode,
 .exchange-state {
   display: inline-flex;
@@ -69,43 +64,17 @@
   gap: 18px;
   min-width: 330px;
 }
-.integration-controls label {
-  color: #d1e4ed;
-}
-.integration-controls select {
-  color: #143850;
-  background: #fff;
-  margin-top: 8px;
-}
+
+
 .integration-actions {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
 }
-.integration-metrics {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-.integration-metrics article {
-  display: grid;
-  grid-template-columns: 32px 1fr;
-  align-items: center;
-  gap: 8px 16px;
-  padding: 24px;
-  background: linear-gradient(125deg, #fff, #f3f8fb);
-  border: 1px solid #dce7ef;
-  border-radius: 20px;
-}
-.integration-metrics strong {
-  font-size: 30px;
-  color: #173a53;
-}
-.integration-metrics span {
-  grid-column: 2;
-  font-size: 13px;
-  color: #647f94;
-}
+
+
+
+
 .integration-diagnostics pre {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -116,23 +85,9 @@
   cursor: pointer;
   font-weight: 600;
 }
-.integration-tabs {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.integration-tabs button {
-  padding: 12px 20px;
-  border-radius: 14px;
-  color: #5d778b;
-  background: transparent;
-  transition: background 0.2s;
-}
-.integration-tabs .selected {
-  background: #173e58;
-  color: white;
-  box-shadow: 0 5px 16px #163d591a;
-}
+
+
+
 .integration-section-head {
   display: flex;
   gap: 24px;
@@ -420,4 +375,86 @@
 .bot-event-list {
   font-size: 12px;
   color: #657e91;
+}
+
+/* ---------- выравнивание с остальными страницами ---------- */
+.integration-page { gap: 20px; }
+.integration-page > .page-heading { margin-bottom: 0; }
+.integration-page .page-heading h1 { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.integration-mode,
+.exchange-state { gap: 7px; padding: 6px 12px; font-size: 12.5px; font-weight: 700; letter-spacing: 0; white-space: nowrap; }
+.integration-mode i,
+.exchange-state i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
+.integration-page .page-heading .integration-mode { font-size: 13px; }
+
+.integration-hero { align-items: flex-end; padding: 32px 36px; }
+.integration-hero h2 { margin: 14px 0 6px; font-size: 28px; }
+.integration-hero p { margin: 0 0 4px; }
+.integration-controls { min-width: 360px; gap: 14px; }
+.integration-mode-switch > span { display: block; margin-bottom: 8px; color: #d1e4ed; font-size: 13px; font-weight: 600; }
+.integration-mode-switch > div {
+  display: flex; gap: 4px; padding: 4px; border-radius: 14px;
+  background: rgba(255, 255, 255, 0.1); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+.integration-mode-switch button {
+  flex: 1; height: 40px; padding: 0 12px; border: 0; border-radius: 11px; background: none;
+  color: #d1e4ed; font: inherit; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.integration-mode-switch button:hover:not(:disabled):not(.selected) { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.integration-mode-switch button.selected { background: #fff; color: #143850; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18); }
+.integration-mode-switch button:disabled { cursor: default; opacity: 0.7; }
+.integration-actions .button { flex: 1; }
+
+.integration-metrics { grid-template-columns: repeat(3, 1fr); margin: 0; }
+
+.integration-diagnostics summary,
+.bitrix-bot-panel summary {
+  display: flex; align-items: center; gap: 8px; list-style: none; cursor: pointer; font-weight: 600;
+}
+.integration-diagnostics summary::-webkit-details-marker,
+.bitrix-bot-panel summary::-webkit-details-marker { display: none; }
+.integration-diagnostics summary::before,
+.bitrix-bot-panel summary::before {
+  content: ""; width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg); transition: transform 0.2s; opacity: 0.6;
+}
+.integration-diagnostics[open] summary::before,
+.bitrix-bot-panel details[open] summary::before { transform: rotate(45deg); }
+.integration-diagnostics pre {
+  margin: 16px 0; padding: 16px; border-radius: 12px; background: #f5f8fb; color: #35546b; font-size: 12.5px;
+}
+
+.bitrix-bot-panel { border-top: 0; }
+.bitrix-bot-panel .integration-section-head { align-items: flex-start; margin-bottom: 16px; }
+.bitrix-bot-title { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; }
+.bitrix-bot-panel .integration-section-head p { margin: 0; }
+.bot-flow { margin: 16px 0; gap: 8px; }
+.bot-flow span { padding: 8px 14px; border-radius: 999px; background: #f2f6f9; font-size: 12.5px; font-weight: 600; }
+.bot-status { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 0 0 10px; }
+.bitrix-bot-panel > p, .bitrix-bot-panel p.muted { line-height: 1.6; }
+.bitrix-bot-panel details { margin-top: 14px; padding-top: 14px; border-top: 1px solid #e8eff4; }
+.bitrix-bot-panel details p { margin: 10px 0 0; }
+
+.integration-page > .list-tabs { margin: 4px 0 0; }
+.integration-section-head h2, .integration-section-head h3 { margin: 0 0 6px; font-size: 20px; }
+.integration-section-head p { margin: 0; }
+.integration-table select { min-height: 38px; padding: 6px 34px 6px 12px; font-size: 13px; }
+
+@media (max-width: 850px) {
+  .integration-controls { min-width: 0; }
+  .integration-metrics { grid-template-columns: 1fr; }
+  .integration-mode-switch button { font-size: 12px; padding: 0 6px; }
+}
+.metrics.integration-metrics { grid-template-columns: repeat(3, 1fr); margin: 0; }
+.integration-controls { min-width: 420px; }
+.integration-actions { flex-wrap: nowrap; }
+.integration-actions .button { flex: 1; white-space: nowrap; padding: 0 16px; }
+@media (max-width: 1100px) {
+  .integration-hero { flex-direction: column; align-items: stretch; }
+  .integration-controls { min-width: 0; }
+}
+@media (max-width: 850px) {
+  .metrics.integration-metrics { grid-template-columns: 1fr; }
+  .integration-actions { flex-wrap: wrap; }
 }
