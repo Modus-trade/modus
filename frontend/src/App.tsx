@@ -23,6 +23,7 @@ import {
   ArrowRight,
   CircleHelp,
   Unplug,
+  Workflow,
   Radar,
   BookOpen,
   type LucideIcon,
@@ -246,7 +247,7 @@ export default function App() {
       ? [
           { path: "/categories", label: "Категории", icon: Layers3 },
           { path: "/users", label: "Пользователи", icon: Users },
-          { path: "/integrations", label: "Интеграции", icon: Unplug },
+          { path: "/integrations", label: "Интеграции", icon: Workflow },
           { path: "/unassigned", label: "Нераспределённые", icon: Unplug, alert: attention.data?.counts.unassigned },
         ]
       : []),
