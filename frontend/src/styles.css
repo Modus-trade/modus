@@ -5639,3 +5639,7 @@ main {
 @media (max-width: 640px) {
   .voice-rec-wave { display: none; }
 }
+.insights-lead { margin: 4px 0 12px; font-size: 13px; line-height: 1.5; }
+.insights-articles { list-style: none; margin: 4px 0 10px; padding: 0; display: grid; gap: 6px; }
+.insights-articles a { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px; background: #fff; border: 1px solid #e4ebf1; color: #173a53; font-size: 13px; font-weight: 600; text-decoration: none; }
+.insights-articles a:hover { border-color: #9fb6c8; }

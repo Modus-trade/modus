@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Sparkles, MessageSquareReply, ClipboardCheck } from "lucide-react";
+import { Link } from "react-router-dom";
+import { BookOpen, Sparkles, MessageSquareReply, ClipboardCheck } from "lucide-react";
 import { api, errorMessage } from "../lib";
 
 interface Solution {
@@ -8,7 +9,8 @@ interface Solution {
   steps: string[];
   based_on: string[];
   reply_draft: string;
-  source: "ai" | "rules";
+  source: "ai" | "knowledge";
+  articles?: { id: number; title: string }[];
 }
 
 /** Для ответственного: вариант решения текущего обращения. */
@@ -37,6 +39,12 @@ export function TicketInsights({
     <section className="panel padded insights">
       {!final && (
         <>
+          <h3>
+            <Sparkles size={16} /> Помощь ИИ
+          </h3>
+          <p className="muted insights-lead">
+            Суть, шаги решения и черновик ответа автору. Если ИИ недоступен — подходящие проверенные инструкции.
+          </p>
           <button
             type="button"
             className="insights-solve"
@@ -54,16 +62,28 @@ export function TicketInsights({
           {s ? (
             <div className="insights-answer">
               <p>{s.summary}</p>
-              <ol>
-                {s.steps.map((step, n) => (
-                  <li key={n}>{step}</li>
-                ))}
-              </ol>
+              {s.source === "knowledge" && s.articles?.length ? (
+                <ul className="insights-articles">
+                  {s.articles.map((a) => (
+                    <li key={a.id}>
+                      <Link to={`/knowledge?article=${a.id}`}>
+                        <BookOpen size={14} /> {a.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <ol>
+                  {s.steps.map((step, n) => (
+                    <li key={n}>{step}</li>
+                  ))}
+                </ol>
+              )}
               {s.based_on.length ? (
                 <small>С опорой на {s.based_on.join(", ")}</small>
               ) : null}
               <small className="smart-hint-source">
-                Предложено ИИ. Проверьте перед отправкой.
+                {s.source === "ai" ? "Предложено ИИ. Проверьте перед отправкой." : "Инструкции проверены и опубликованы в «Инструкциях и ответах»."}
               </small>
               <div className="insights-actions">
                 {s.reply_draft ? (

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BookOpen,
@@ -210,6 +211,17 @@ export default function KnowledgeBase({
   const [state, setState] = useState("DRAFT");
   const [reader, setReader] = useState<KnowledgeArticle | null>(null);
   const [editor, setEditor] = useState<number | null>(null);
+  // Ссылка вида /knowledge?article=ID (например, из «Помощи ИИ» в карточке) сразу открывает инструкцию.
+  const [params, setParams] = useSearchParams();
+  const linked = params.get("article");
+  useEffect(() => {
+    if (!linked) return;
+    api
+      .get<KnowledgeArticle>(`/knowledge/${linked}`)
+      .then((r) => setReader(r.data))
+      .catch(() => undefined)
+      .finally(() => setParams({}, { replace: true }));
+  }, [linked, setParams]);
   useEffect(() => {
     const resetAccess = () => {
       setReader(null);
