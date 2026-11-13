@@ -1,15 +1,15 @@
-import { useRouter } from 'expo-router';
+
 import { SymbolView } from 'expo-symbols';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
-import { api, type SimilarItem, type Solution } from './api';
+import { api, type Solution } from './api';
 import { Card } from './components';
 import { Haptics } from './settings';
-import { colors, statusMeta } from './theme';
+import { colors } from './theme';
 import { PressableScale, Text } from './ui';
 
-/** Для ответственного: похожие обращения и вариант решения от ИИ. */
+/** Для ответственного: вариант решения от ИИ. */
 export function TicketInsights({
   ticketId,
   final,
@@ -21,15 +21,9 @@ export function TicketInsights({
   onUseReply: (text: string) => void;
   onUseResult: (text: string) => void;
 }) {
-  const router = useRouter();
-  const [items, setItems] = useState<SimilarItem[] | null>(null);
   const [solution, setSolution] = useState<Solution | null>(null);
   const [solving, setSolving] = useState(false);
   const [note, setNote] = useState<string | null>(null);
-
-  useEffect(() => {
-    api.similar(ticketId).then((r) => setItems(r.items)).catch(() => setItems([]));
-  }, [ticketId]);
 
   async function solve() {
     Haptics.selectionAsync();
@@ -48,34 +42,9 @@ export function TicketInsights({
   return (
     <Card style={s.card}>
       <View style={s.head}>
-        <SymbolView name="square.stack.3d.up" size={16} tintColor={colors.secondary} />
-        <Text style={s.title}>Похожие обращения</Text>
+        <SymbolView name="sparkles" size={16} tintColor={colors.secondary} />
+        <Text style={s.title}>Помощь ИИ</Text>
       </View>
-      {items === null ? (
-        <ActivityIndicator style={{ alignSelf: 'flex-start' }} />
-      ) : items.length ? (
-        items.map((i) => (
-          <PressableScale key={i.id} onPress={() => router.push(`/ticket/${i.id}`)} style={s.item}>
-            <View style={s.itemRow}>
-              <View style={[s.dot, { backgroundColor: statusMeta[i.status].color }]} />
-              <Text style={s.itemTitle} numberOfLines={1}>
-                {i.title}
-              </Text>
-            </View>
-            <Text style={s.meta}>
-              {i.number} · {statusMeta[i.status].label}
-            </Text>
-            {i.resolution ? (
-              <Text style={s.resolution} numberOfLines={2}>
-                {i.resolution}
-              </Text>
-            ) : null}
-          </PressableScale>
-        ))
-      ) : (
-        <Text style={s.meta}>Похожих обращений не нашлось</Text>
-      )}
-
       {!final ? (
         <>
           <PressableScale onPress={solve} disabled={solving} style={s.solve}>
@@ -92,7 +61,7 @@ export function TicketInsights({
                 </Text>
               ))}
               <Text style={s.source}>
-                {solution.source === 'ai' ? 'Предложено ИИ — проверьте перед отправкой' : 'ИИ недоступен — показаны решения похожих'}
+                Предложено ИИ — проверьте перед отправкой
                 {solution.based_on.length ? ` · ${solution.based_on.join(', ')}` : ''}
               </Text>
               <View style={s.actions}>

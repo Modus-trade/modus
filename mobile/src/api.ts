@@ -255,13 +255,10 @@ export const api = {
   summary: () => request<Summary>('/api/analytics/summary'),
   suggest: (data: { title: string; description: string; image_base64?: string | null }) =>
     request<Suggestion>('/api/assist/suggest', { method: 'POST', body: json(data) }),
-  sharedProblems: (text: string, category_id: number | null) =>
-    request<{ items: SharedProblem[] }>('/api/problems/similar', { method: 'POST', body: json({ text, category_id }) }),
   joinProblem: (id: number) => request<SharedProblem>(`/api/problems/${id}/join`, { method: 'POST' }),
   joinedProblems: () => request<{ items: SharedProblem[]; total: number }>('/api/problems/joined'),
   voice: (data: { audio_base64: string; format: string }) =>
     request<VoiceResult>('/api/assist/voice', { method: 'POST', body: json(data) }),
-  similar: (id: number) => request<{ items: SimilarItem[]; ai_enabled: boolean }>(`/api/tickets/${id}/similar`),
   solve: (id: number) => request<Solution>(`/api/tickets/${id}/solve`, { method: 'POST' }),
 };
 

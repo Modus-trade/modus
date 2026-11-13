@@ -15,7 +15,6 @@ import {
 import { PressableScale, Text, TextInput } from '@/ui';
 import { api, firstImageBase64, type Category, type Suggestion, type TicketType, type User, type VoiceResult } from '@/api';
 import { VoiceInput } from '@/voice';
-import { SharedProblems } from '@/shared';
 import { Card, layout, styles } from '@/components';
 import { MenuPicker, Segmented } from '@/native';
 import Animated, { FadeIn, FadeInDown, FadeOut, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
@@ -236,18 +235,6 @@ export default function NewTicket() {
               </PressableScale>
             ) : null}
           </Animated.View>
-        ) : null}
-
-        {type === 'PROBLEM' ? (
-          <SharedProblems
-            text={`${title} ${description}`}
-            categoryId={categoryId}
-            onJoined={(p) => {
-              router.dismiss();
-              router.push(`/ticket/${p.id}`);
-              Alert.alert('Вы присоединились', `${p.number}: новое обращение не создано — статус и результат придут вам.`);
-            }}
-          />
         ) : null}
 
         <Segmented options={TYPES.map((t) => (t === 'PRAISE' ? 'Отзыв' : typeMeta[t].label))} index={TYPES.indexOf(type)} onChange={(i) => { manual.current.type = true; setType(TYPES[i]); }} />
