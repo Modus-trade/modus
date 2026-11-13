@@ -1,3 +1,4 @@
+import "./onec.css";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { TicketInsights } from "./components/TicketInsights";
@@ -168,7 +169,7 @@ export default function TicketDetail({ user }: { user: User }) {
             {types[t.type]}
             <span>·</span>
             {t.category_name}
-            {t.onec_item && <span className="bitrix-source">1С · Демо: {t.onec_item.Description} · {t.onec_item.Code}</span>}
+            {t.onec_item && <span className="bitrix-source">1С · {t.onec_item.mode === "mock" ? "Демо" : "Номенклатура"}: {t.onec_item.Description} · {t.onec_item.Code}</span>}
             {t.source === "BITRIX24" && <span className="bitrix-source">Источник: Битрикс24</span>}
           </div>
           <h1>{t.title}</h1>
@@ -418,6 +419,7 @@ export default function TicketDetail({ user }: { user: User }) {
           )}
         </div>
         <aside className="detail-side">
+          {t.onec_document && <section className="onec-document"><h3>Документ 1С {t.onec_document.mode === "mock" && "· Демо"}</h3><p>{t.onec_document.Description} № {t.onec_document.Number}</p><p>Дата: {t.onec_document.Date?.slice(0,10)}</p><p>Контрагент: {t.onec_document.partner?.Description || "Не указан"}</p><small className="muted">Снимок данных на момент создания обращения</small></section>}
           {!participant && <BitrixTask ticket={t} user={user} />}
           <section className="panel padded">
             <h3>Детали обращения</h3>

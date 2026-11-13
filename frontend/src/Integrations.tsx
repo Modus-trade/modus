@@ -1,3 +1,4 @@
+import OneCPanel from "./components/OneCPanel";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
@@ -95,7 +96,7 @@ interface Overview {
   jobs: Job[];
 }
 
-export default function Integrations() {
+function BitrixIntegrations() {
   const qc = useQueryClient();
   const [busy, setBusy] = useState(false);
   const [search, setSearch] = useState("");
@@ -456,3 +457,5 @@ export default function Integrations() {
     </div>
   );
 }
+
+export default function Integrations(){return <><OneCPanel/><BitrixIntegrations/></>}

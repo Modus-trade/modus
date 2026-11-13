@@ -1,4 +1,4 @@
-import OneCItemPicker from "./components/OneCItemPicker";
+import OneCItemPicker, {emptyOneC, type OneCSelection} from "./components/OneCItemPicker";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -394,14 +394,17 @@ export function NewTicket({
       setFiles([]);
     }
   }, [open, initialKnowledge, reset]);
-  const [onecItem,setOnecItem]=useState("");
+  const [onecItem,setOnecItem]=useState<OneCSelection>(emptyOneC);
   async function submit(values: FormValues) {
     if (busy) return;
     setBusy(true);
     try {
       const { data } = await api.post("/tickets", {
         ...values,
-        onec_item_ref: onecItem || null,
+        onec_item_ref: onecItem.item || null,
+        onec_document_ref: onecItem.document || null,
+        onec_document_kind: onecItem.kind,
+        onec_scope: onecItem.scope || null,
         is_shared: values.type === "PROBLEM" && values.is_shared,
         ...(viewedSolution ? { self_service_attempt_id: attemptId } : {}),
       });
@@ -422,7 +425,7 @@ export function NewTicket({
         );
       qc.invalidateQueries();
       reset();
-      setOnecItem("");
+      setOnecItem(emptyOneC);
       setFiles([]);
       setManual({ type: false, category: false });
       setAttemptId(crypto.randomUUID());
@@ -526,7 +529,7 @@ export function NewTicket({
             )}
           </label>
         </div>
-        <OneCItemPicker value={onecItem} onChange={setOnecItem} />
+        <OneCItemPicker value={onecItem} onChange={v=>{setOnecItem(v);if(v.document)setValue("is_shared",false)}} />
         {category && (
           <p className="routing-note">
             {category.default_assignee_id
@@ -535,7 +538,7 @@ export function NewTicket({
             Срок первого ответа: {category.sla_first_response_hours} ч.
           </p>
         )}
-        {watch("type") === "PROBLEM" && (
+        {watch("type") === "PROBLEM" && !onecItem.document && (
           <>
             <label className="shared-problem-toggle">
               <input type="checkbox" {...register("is_shared")} />

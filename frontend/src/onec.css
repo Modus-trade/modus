@@ -1,0 +1,218 @@
+.onec-section {
+  display: grid;
+  gap: 24px;
+  margin-bottom: 36px;
+}
+.onec-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+}
+.onec-heading h1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.onec-readonly {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #e9f6ef;
+  color: #247851;
+  border: 1px solid #cee9da;
+  border-radius: 30px;
+  padding: 10px 16px;
+  white-space: nowrap;
+}
+.onec-controls,
+.onec-filters {
+  display: flex;
+  gap: 16px;
+  align-items: end;
+  flex-wrap: wrap;
+  margin: 24px 0;
+}
+.onec-controls label,
+.onec-filters label {
+  flex: 1;
+  min-width: 180px;
+  display: grid;
+  gap: 8px;
+}
+.onec-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 24px 0;
+}
+.onec-stats > div {
+  display: grid;
+  gap: 8px;
+  border: 1px solid #dce6ef;
+  background: linear-gradient(135deg, #fff, #f0f6fa);
+  border-radius: 18px;
+  padding: 24px;
+}
+.onec-stats strong {
+  font-size: 32px;
+  color: #153c55;
+}
+.onec-notice,
+.onec-empty {
+  padding: 20px;
+  border-radius: 14px;
+  background: #f1f6fa;
+  color: #4a6478;
+}
+.onec-picker {
+  border: 1px solid #dce5ee;
+  border-radius: 16px;
+  padding: 20px;
+  margin: 16px 0;
+}
+.onec-picker legend {
+  font-weight: 650;
+  padding: 0 8px;
+  color: #234d67;
+}
+.onec-picker label,
+.onec-search {
+  display: grid;
+  gap: 10px;
+}
+.onec-search {
+  margin: 16px 0;
+}
+.onec-picker details {
+  margin-top: 18px;
+}
+.onec-picker summary,
+.onec-log summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 10px 0;
+}
+.onec-log > div {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #edf1f5;
+}
+.onec-log small {
+  display: block;
+  color: #70899b;
+  margin-top: 4px;
+}
+.onec-error {
+  color: #b33737;
+}
+.onec-success {
+  color: #27774c;
+}
+.onec-ranks {
+  display: grid;
+  gap: 10px;
+  margin: 20px 0;
+}
+.onec-ranks > button {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  text-align: left;
+  padding: 18px;
+  border: 1px solid #dfe8ef;
+  border-radius: 16px;
+  background: #fff;
+  transition:
+    background 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.onec-ranks > button:hover,
+.onec-ranks > button.selected {
+  background: #f1f7fa;
+  box-shadow: 0 6px 20px #193b5510;
+}
+.onec-rank-number {
+  font-size: 22px;
+  color: #91a8b8;
+}
+.onec-rank-name {
+  flex: 1;
+  min-width: 0;
+}
+.onec-ranks small {
+  display: block;
+  color: #738b9c;
+  font-size: 12px;
+  margin-top: 5px;
+}
+.onec-ranks b {
+  font-size: 25px;
+  color: #183f58;
+}
+.onec-bar {
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, #367392, #9ec6d4);
+  border-radius: 3px;
+  margin-top: 10px;
+}
+.onec-drill {
+  margin-top: 24px;
+  border-top: 1px solid #e0e8ef;
+  padding-top: 20px;
+}
+.onec-drill > a {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px 0;
+  border-bottom: 1px solid #edf1f5;
+  color: #204e6b;
+}
+.onec-pagination {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-top: 20px;
+}
+.onec-document {
+  border: 1px solid #dce6ef;
+  border-radius: 16px;
+  padding: 20px;
+  margin: 20px 0;
+  background: #f7fafc;
+}
+.onec-document h3 {
+  margin-bottom: 12px;
+}
+.onec-document p {
+  margin: 8px 0;
+}
+@media (max-width: 700px) {
+  .onec-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+  .onec-stats {
+    grid-template-columns: 1fr;
+  }
+  .onec-ranks > button {
+    gap: 10px;
+    padding: 12px;
+  }
+  .onec-ranks b {
+    font-size: 20px;
+  }
+  .onec-drill > a {
+    flex-direction: column;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .onec-ranks > button {
+    transition: none;
+  }
+}

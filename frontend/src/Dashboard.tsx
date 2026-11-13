@@ -1,3 +1,4 @@
+import OneCAnalytics from "./components/OneCAnalytics";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import {
@@ -308,6 +309,7 @@ export default function Dashboard({
           </ol>
         </section>
       ) : null}
+      <OneCAnalytics/>
     </div>
   );
 }
