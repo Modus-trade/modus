@@ -168,6 +168,7 @@ export default function TicketDetail({ user }: { user: User }) {
             {types[t.type]}
             <span>·</span>
             {t.category_name}
+            {t.onec_item && <span className="bitrix-source">1С · Демо: {t.onec_item.Description} · {t.onec_item.Code}</span>}
             {t.source === "BITRIX24" && <span className="bitrix-source">Источник: Битрикс24</span>}
           </div>
           <h1>{t.title}</h1>

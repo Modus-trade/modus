@@ -83,6 +83,7 @@ export interface Category {
   sort_order: number;
 }
 export interface Ticket {
+  onec_item?: { Description: string; Code: string; Ref_Key: string; mode: string } | null;
   source?: "WEB" | "BITRIX24";
   is_shared: boolean;
   /** participant — присоединился к общей проблеме: только просмотр */

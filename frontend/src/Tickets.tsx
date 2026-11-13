@@ -1,3 +1,4 @@
+import OneCItemPicker from "./components/OneCItemPicker";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -393,12 +394,14 @@ export function NewTicket({
       setFiles([]);
     }
   }, [open, initialKnowledge, reset]);
+  const [onecItem,setOnecItem]=useState("");
   async function submit(values: FormValues) {
     if (busy) return;
     setBusy(true);
     try {
       const { data } = await api.post("/tickets", {
         ...values,
+        onec_item_ref: onecItem || null,
         is_shared: values.type === "PROBLEM" && values.is_shared,
         ...(viewedSolution ? { self_service_attempt_id: attemptId } : {}),
       });
@@ -419,6 +422,7 @@ export function NewTicket({
         );
       qc.invalidateQueries();
       reset();
+      setOnecItem("");
       setFiles([]);
       setManual({ type: false, category: false });
       setAttemptId(crypto.randomUUID());
@@ -522,6 +526,7 @@ export function NewTicket({
             )}
           </label>
         </div>
+        <OneCItemPicker value={onecItem} onChange={setOnecItem} />
         {category && (
           <p className="routing-note">
             {category.default_assignee_id
