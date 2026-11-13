@@ -1,6 +1,9 @@
 services:
   backend:
     build: ./backend
+    env_file:
+      - path: ./backend/.env
+        required: false
     environment:
       DATABASE_URL: sqlite:////data/app.db
       JWT_SECRET: ${JWT_SECRET:-modus-local-demo-change-this-secret-before-production}
