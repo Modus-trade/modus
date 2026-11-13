@@ -1,3 +1,4 @@
+import Impact from "./Impact";
 import { useEffect, useState } from "react";
 import {
   NavLink,
@@ -26,6 +27,7 @@ import {
   Workflow,
   Radar,
   BookOpen,
+  TrendingUp,
   type LucideIcon,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -242,6 +244,7 @@ export default function App() {
       label: admin ? "Все обращения" : manager ? "Инбокс" : "Мои обращения",
       icon: Inbox,
     },
+    ...((admin || manager) ? [{path:"/impact",label:"Эффект сервиса",icon:TrendingUp}] : []),
     { path: "/knowledge", label: "Инструкции и ответы", icon: BookOpen },
     ...(admin
       ? [
@@ -381,6 +384,7 @@ export default function App() {
         </header>
         <main key={location.pathname}>
           <Routes>
+            <Route path="/impact" element={admin || manager ? <Impact/> : <Navigate to="/" replace/>}/>
             <Route
               path="/"
               element={
